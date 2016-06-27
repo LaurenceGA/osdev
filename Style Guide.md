@@ -28,7 +28,7 @@ Align "case" labels with their "switch" statement, e.g.:
 	}
 ```
 
-Dondd't put multiple statements on a single line unless you have
+Don't put multiple statements on a single line unless you have
 something to hide:
 
 Each line should do only one thing, that is to say that this:
@@ -59,16 +59,17 @@ available tools.
 The preferred limit on the length of a line is 80 characters, however, there are
 circumstances in which this can be broken. Statements longer than 80 columns
 should be broken into sensible chunks, unless exceeding 80 columns significantly
-increases readability and does not hide information. Descendants are always
-substantially shorter than the parent and are placed substantially to the right.
-The same applies to function headers with a long argument list. However, never
-break user-visible strings such as printk messages, because that breaks the
-ability to grep for them.
+increases readability and does not hide information.
+
+Descendants are always substantially shorter than the parent and are placed
+substantially to the right. The same applies to function headers with a long
+argument list. However, never break user-visible strings such as printk messages,
+because that breaks the ability to grep for them.
 
 ## Chapter 3: Placing Braces and Spaces
 
 The other issue that always comes up in C styling is the placement of
-braces.  Unlike the indent size, there are few technical reasons to
+braces. Unlike the indent size, there are few technical reasons to
 choose one placement strategy over the other, but the preferred way, as
 shown to us by the prophets Kernighan and Ritchie, is to put the opening
 brace last on the line, and put the closing brace first, thusly:
@@ -100,7 +101,7 @@ the same line, as in:
 
 ```C
 	int function(int x) {
-		// body of function
+		...
 	}
 ```
 
@@ -111,7 +112,7 @@ this:
 
 ```C
 	do {
-		body of do-loop
+		...
 	} while (condition);
 ```
 
@@ -128,7 +129,7 @@ and
 ```
 
 Also, note that this brace-placement also minimizes the number of empty
-(or almost empty) lines, without any loss of readability.  Thus, as the
+(or almost empty) lines, without any loss of readability. Thus, as the
 supply of new-lines on your screen is not a renewable resource (think
 25-line terminal screens here), you have more empty lines to put
 comments on.
@@ -173,13 +174,13 @@ So use a space after these keywords:
 	if, switch, case, for, do, while
 ```
 
-but not with sizeof, typeof, alignof, or __attribute__.  E.g.,
+but not with sizeof, typeof, alignof, or __attribute__. E.g.,
 
 ```C
 	s = sizeof(struct file);
 ```
 
-Do not add spaces around (inside) parenthesized expressions.  This example is
+Do not add spaces around (inside) parenthesized expressions. This example is
 *bad*:
 
 ```C
@@ -188,7 +189,7 @@ Do not add spaces around (inside) parenthesized expressions.  This example is
 
 When declaring pointer data or a function that returns a pointer type, the
 preferred use of '*' is adjacent to the data name or function name and not
-adjacent to the type name.  Examples:
+adjacent to the type name. Examples:
 
 ```C
 	char *linux_banner;
@@ -209,13 +210,7 @@ but no space after unary operators:
 	&  *  +  -  ~  !  sizeof  typeof  alignof  __attribute__  defined
 ```
 
-no space before the postfix increment & decrement unary operators:
-
-```C
-	++  --
-```
-
-no space after the prefix increment & decrement unary operators:
+no space before, or after, the postfix increment & decrement unary operators:
 
 ```C
 	++  --
@@ -223,11 +218,11 @@ no space after the prefix increment & decrement unary operators:
 
 and no space around the '.' and "->" structure member operators.
 
-Do not leave trailing whitespace at the ends of lines.  Some editors with
+Do not leave trailing whitespace at the ends of lines. Some editors with
 "smart" indentation will insert whitespace at the beginning of new lines as
 appropriate, so you can start typing the next line of code right away.
 However, some such editors do not remove the whitespace if you end up not
-putting a line of code there, such as if you leave a blank line.  As a result,
+putting a line of code there, such as if you leave a blank line. As a result,
 you end up with lines containing trailing whitespace.
 
 Git will warn you about patches that introduce trailing whitespace, and can
@@ -243,7 +238,7 @@ naming convention, e.g.
 
 ```C
 	void reallyLongNameFunction(int reallyLongVariableName) {
-		// Body
+		...
 	}
 ```
 
@@ -333,12 +328,12 @@ From the Linux Kernel Style Guide:
 
 ## Chapter 6: Functions
 
-Functions should be short and sweet, and do just one thing.  They should
+Functions should be short and sweet, and do just one thing. They should
 fit on one or two screenfuls of text (the ISO/ANSI screen size is 80x24,
 as we all know), and do one thing and do that well.
 
 The maximum length of a function is inversely proportional to the
-complexity and indentation level of that function.  So, if you have a
+complexity and indentation level of that function. So, if you have a
 conceptually simple function that is just one long (but simple)
 case-statement, where you have to do lots of small things for a lot of
 different cases, it's OK to have a longer function.
@@ -346,55 +341,58 @@ different cases, it's OK to have a longer function.
 However, if you have a complex function, and you suspect that a
 less-than-gifted first-year high-school student might not even
 understand what the function is all about, you should adhere to the
-maximum limits all the more closely.  Use helper functions with
+maximum limits all the more closely. Use helper functions with
 descriptive names (you can ask the compiler to in-line them if you think
 it's performance-critical, and it will probably do a better job of it
 than you would have done).
 
-Another measure of the function is the number of local variables.  They
-shouldn't exceed 5-10, or you're doing something wrong.  Re-think the
-function, and split it into smaller pieces.  A human brain can
+Another measure of the function is the number of local variables. They
+shouldn't exceed 5-10, or you're doing something wrong. Re-think the
+function, and split it into smaller pieces. A human brain can
 generally easily keep track of about 7 different things, anything more
-and it gets confused.  You know you're brilliant, but maybe you'd like
+and it gets confused. You know you're brilliant, but maybe you'd like
 to understand what you did 2 weeks from now.
 
-In source files, separate functions with one blank line.  If the function is
+In source files, separate functions with one blank line. If the function is
 exported, the EXPORT* macro for it should follow immediately after the closing
-function brace line.  E.g.:
+function brace line. E.g.:
 
+```C
 	int system_is_up(void)
 	{
 		return system_state == SYSTEM_RUNNING;
 	}
 	EXPORT_SYMBOL(system_is_up);
+```
 
 In function prototypes, include parameter names with their data types.
 Although this is not required by the C language, it is preferred in Linux
 because it is a simple way to add valuable information for the reader.
 
 
-		Chapter 7: Centralized exiting of functions
+## Chapter 7: Centralized exiting of functions
 
 Albeit deprecated by some people, the equivalent of the goto statement is
 used frequently by compilers in form of the unconditional jump instruction.
 
 The goto statement comes in handy when a function exits from multiple
-locations and some common work such as cleanup has to be done.  If there is no
+locations and some common work such as cleanup has to be done. If there is no
 cleanup needed then just return directly.
 
-Choose label names which say what the goto does or why the goto exists.  An
-example of a good name could be "out_buffer:" if the goto frees "buffer".  Avoid
-using GW-BASIC names like "err1:" and "err2:".  Also don't name them after the
+Choose label names which say what the goto does or why the goto exists. An
+example of a good name could be "out_buffer:" if the goto frees "buffer". Avoid
+using GW-BASIC names like "err1:" and "err2:". Also don't name them after the
 goto location like "err_kmalloc_failed:"
 
 The rationale for using gotos is:
 
-- unconditional statements are easier to understand and follow
-- nesting is reduced
-- errors by not updating individual exit points when making
+* unconditional statements are easier to understand and follow
+* nesting is reduced
+* errors by not updating individual exit points when making
     modifications are prevented
-- saves the compiler work to optimize redundant code away ;)
+* saves the compiler work to optimize redundant code away ;)
 
+```C
 	int fun(int a)
 	{
 		int result = 0;
@@ -416,21 +414,24 @@ The rationale for using gotos is:
 		kfree(buffer);
 		return result;
 	}
+```
 
 A common type of bug to be aware of is "one err bugs" which look like this:
 
+```C
 	err:
 		kfree(foo->bar);
 		kfree(foo);
 		return ret;
+```
 
-The bug in this code is that on some exit paths "foo" is NULL.  Normally the
+The bug in this code is that on some exit paths "foo" is NULL. Normally the
 fix for this is to split it up into two error labels "err_bar:" and "err_foo:".
 
 
-		Chapter 8: Commenting
+## Chapter 8: Commenting
 
-Comments are good, but there is also a danger of over-commenting.  NEVER
+Comments are good, but there is also a danger of over-commenting. NEVER
 try to explain HOW your code works in a comment: it's much better to
 write the code so that the _working_ is obvious, and it's a waste of
 time to explain badly written code.
@@ -438,9 +439,9 @@ time to explain badly written code.
 Generally, you want your comments to tell WHAT your code does, not HOW.
 Also, try to avoid putting comments inside a function body: if the
 function is so complex that you need to separately comment parts of it,
-you should probably go back to chapter 6 for a while.  You can make
+you should probably go back to chapter 6 for a while. You can make
 small comments to note or warn about something particularly clever (or
-ugly), but try to avoid excess.  Instead, put the comments at the head
+ugly), but try to avoid excess. Instead, put the comments at the head
 of the function, telling people what it does, and possibly WHY it does
 it.
 
@@ -453,6 +454,7 @@ Don't use C99-style "// ..." comments.
 
 The preferred style for long (multi-line) comments is:
 
+```C
 	/*
 	 * This is the preferred style for multi-line
 	 * comments in the Linux kernel source code.
@@ -461,26 +463,29 @@ The preferred style for long (multi-line) comments is:
 	 * Description:  A column of asterisks on the left side,
 	 * with beginning and ending almost-blank lines.
 	 */
+```
 
 For files in net/ and drivers/net/ the preferred style for long (multi-line)
 comments is a little different.
 
+```C
 	/* The preferred comment style for files in net/ and drivers/net
 	 * looks like this.
 	 *
 	 * It is nearly the same as the generally preferred comment style,
 	 * but there is no initial almost-blank line.
 	 */
+```
 
 It's also important to comment data, whether they are basic types or derived
-types.  To this end, use just one data declaration per line (no commas for
-multiple data declarations).  This leaves you room for a small comment on each
+types. To this end, use just one data declaration per line (no commas for
+multiple data declarations). This leaves you room for a small comment on each
 item, explaining its use.
 
 
-		Chapter 9: You've made a mess of it
+## Chapter 9: You've made a mess of it
 
-That's OK, we all do.  You've probably been told by your long-time Unix
+That's OK, we all do. You've probably been told by your long-time Unix
 user helper that "GNU emacs" automatically formats the C sources for
 you, and you've noticed that yes, it does do that, but the defaults it
 uses are less than desirable (in fact, they are worse than random
@@ -488,7 +493,7 @@ typing - an infinite number of monkeys typing into GNU emacs would never
 make a good program).
 
 So, you can either get rid of GNU emacs, or change it to use saner
-values.  To do the latter, you can stick the following in your .emacs file:
+values. To do the latter, you can stick the following in your .emacs file:
 
 (defun c-lineup-arglist-tabs-only (ignored)
   "Line up argument lists by tabs, not spaces"
@@ -535,16 +540,16 @@ options "-kr -i8" (stands for "K&R, 8 character indents"), or use
 "scripts/Lindent", which indents in the latest style.
 
 "indent" has a lot of options, and especially when it comes to comment
-re-formatting you may want to take a look at the man page.  But
+re-formatting you may want to take a look at the man page. But
 remember: "indent" is not a fix for bad programming.
 
 
-		Chapter 10: Kconfig configuration files
+## Chapter 10: Kconfig configuration files
 
 For all of the Kconfig* configuration files throughout the source tree,
-the indentation is somewhat different.  Lines under a "config" definition
+the indentation is somewhat different. Lines under a "config" definition
 are indented with one tab, while help text is indented an additional two
-spaces.  Example:
+spaces. Example:
 
 config AUDIT
 	bool "Auditing support"
@@ -552,7 +557,7 @@ config AUDIT
 	help
 	  Enable auditing infrastructure that can be used with another
 	  kernel subsystem, such as SELinux (which requires this for
-	  logging of avc messages output).  Does not do system-call
+	  logging of avc messages output). Does not do system-call
 	  auditing without CONFIG_AUDITSYSCALL.
 
 Seriously dangerous features (such as write support for certain
@@ -567,11 +572,11 @@ For full documentation on the configuration files, see the file
 Documentation/kbuild/kconfig-language.txt.
 
 
-		Chapter 11: Data structures
+## Chapter 11: Data structures
 
 Data structures that have visibility outside the single-threaded
 environment they are created and destroyed in should always have
-reference counts.  In the kernel, garbage collection doesn't exist (and
+reference counts. In the kernel, garbage collection doesn't exist (and
 outside the kernel garbage collection is slow and inefficient), which
 means that you absolutely _have_ to reference count all your uses.
 
@@ -582,11 +587,11 @@ because they slept or did something else for a while.
 
 Note that locking is _not_ a replacement for reference counting.
 Locking is used to keep data structures coherent, while reference
-counting is a memory management technique.  Usually both are needed, and
+counting is a memory management technique. Usually both are needed, and
 they are not to be confused with each other.
 
 Many data structures can indeed have two levels of reference counting,
-when there are users of different "classes".  The subclass count counts
+when there are users of different "classes". The subclass count counts
 the number of subclass users, and decrements the global count just once
 when the subclass count goes to zero.
 
@@ -598,7 +603,7 @@ Remember: if another thread can find your data structure, and you don't
 have a reference count on it, you almost certainly have a bug.
 
 
-		Chapter 12: Macros, Enums and RTL
+## Chapter 12: Macros, Enums and RTL
 
 Names of macros defining constants and labels in enums are capitalized.
 
@@ -613,28 +618,34 @@ Generally, inline functions are preferable to macros resembling functions.
 
 Macros with multiple statements should be enclosed in a do - while block:
 
+```C
 	#define macrofun(a, b, c) 			\
 		do {					\
 			if (a == 5)			\
 				do_this(b, c);		\
 		} while (0)
+```
 
 Things to avoid when using macros:
 
 1) macros that affect control flow:
 
+```C
 	#define FOO(x)					\
 		do {					\
 			if (blah(x) < 0)		\
 				return -EBUGGERED;	\
 		} while (0)
+```
 
-is a _very_ bad idea.  It looks like a function call but exits the "calling"
+is a _very_ bad idea. It looks like a function call but exits the "calling"
 function; don't break the internal parsers of those who will read the code.
 
 2) macros that depend on having a local variable with a magic name:
 
+```C
 	#define FOO(val) bar(index, val)
+```
 
 might look like a good thing, but it's confusing as hell when one reads the
 code and it's prone to breakage from seemingly innocent changes.
@@ -652,12 +663,14 @@ macros using parameters.
 5) namespace collisions when defining local variables in macros resembling
 functions:
 
+```C
 #define FOO(x)				\
 ({					\
 	typeof(x) ret;			\
 	ret = calc_ret(x);		\
 	(ret);				\
 })
+```
 
 ret is a common name for a local variable - __foo_ret is less likely
 to collide with an existing variable.
@@ -666,11 +679,11 @@ The cpp manual deals with macros exhaustively. The gcc internals manual also
 covers RTL which is used frequently with assembly language in the kernel.
 
 
-		Chapter 13: Printing kernel messages
+## Chapter 13: Printing kernel messages
 
 Kernel developers like to be seen as literate. Do mind the spelling
 of kernel messages to make a good impression. Do not use crippled
-words like "dont"; use "do not" or "don't" instead.  Make the messages
+words like "dont"; use "do not" or "don't" instead. Make the messages
 concise, clear, and unambiguous.
 
 Kernel messages do not have to be terminated with a period.
@@ -680,31 +693,31 @@ Printing numbers in parentheses (%d) adds no value and should be avoided.
 There are a number of driver model diagnostic macros in <linux/device.h>
 which you should use to make sure messages are matched to the right device
 and driver, and are tagged with the right level:  dev_err(), dev_warn(),
-dev_info(), and so forth.  For messages that aren't associated with a
+dev_info(), and so forth. For messages that aren't associated with a
 particular device, <linux/printk.h> defines pr_notice(), pr_info(),
 pr_warn(), pr_err(), etc.
 
 Coming up with good debugging messages can be quite a challenge; and once
-you have them, they can be a huge help for remote troubleshooting.  However
+you have them, they can be a huge help for remote troubleshooting. However
 debug message printing is handled differently than printing other non-debug
-messages.  While the other pr_XXX() functions print unconditionally,
+messages. While the other pr_XXX() functions print unconditionally,
 pr_debug() does not; it is compiled out by default, unless either DEBUG is
-defined or CONFIG_DYNAMIC_DEBUG is set.  That is true for dev_dbg() also,
+defined or CONFIG_DYNAMIC_DEBUG is set. That is true for dev_dbg() also,
 and a related convention uses VERBOSE_DEBUG to add dev_vdbg() messages to
 the ones already enabled by DEBUG.
 
 Many subsystems have Kconfig debug options to turn on -DDEBUG in the
-corresponding Makefile; in other cases specific files #define DEBUG.  And
+corresponding Makefile; in other cases specific files #define DEBUG. And
 when a debug message should be unconditionally printed, such as if it is
 already inside a debug-related #ifdef section, printk(KERN_DEBUG ...) can be
 used.
 
 
-		Chapter 14: Allocating memory
+## Chapter 14: Allocating memory
 
 The kernel provides the following general purpose memory allocators:
 kmalloc(), kzalloc(), kmalloc_array(), kcalloc(), vmalloc(), and
-vzalloc().  Please refer to the API documentation for further information
+vzalloc(). Please refer to the API documentation for further information
 about them.
 
 The preferred form for passing a size of a struct is the following:
@@ -731,7 +744,7 @@ Both forms check for overflow on the allocation size n * sizeof(...),
 and return NULL if that occurred.
 
 
-		Chapter 15: The inline disease
+## Chapter 15: The inline disease
 
 There appears to be a common misperception that gcc has a magic "make me
 faster" speedup option called "inline". While the use of inlines can be
@@ -758,102 +771,108 @@ appears outweighs the potential value of the hint that tells gcc to do
 something it would have done anyway.
 
 
-		Chapter 16: Function return values and names
+## Chapter 16: Function return values and names
 
 Functions can return values of many different kinds, and one of the
 most common is a value indicating whether the function succeeded or
-failed.  Such a value can be represented as an error-code integer
+failed. Such a value can be represented as an error-code integer
 (-Exxx = failure, 0 = success) or a "succeeded" boolean (0 = failure,
 non-zero = success).
 
 Mixing up these two sorts of representations is a fertile source of
-difficult-to-find bugs.  If the C language included a strong distinction
+difficult-to-find bugs. If the C language included a strong distinction
 between integers and booleans then the compiler would find these mistakes
-for us... but it doesn't.  To help prevent such bugs, always follow this
+for us... but it doesn't. To help prevent such bugs, always follow this
 convention:
 
-	If the name of a function is an action or an imperative command,
-	the function should return an error-code integer.  If the name
-	is a predicate, the function should return a "succeeded" boolean.
+>	If the name of a function is an action or an imperative command,
+>	the function should return an error-code integer. If the name
+>	is a predicate, the function should return a "succeeded" boolean.
 
 For example, "add work" is a command, and the add_work() function returns 0
-for success or -EBUSY for failure.  In the same way, "PCI device present" is
+for success or -EBUSY for failure. In the same way, "PCI device present" is
 a predicate, and the pci_dev_present() function returns 1 if it succeeds in
 finding a matching device or 0 if it doesn't.
 
 All EXPORTed functions must respect this convention, and so should all
-public functions.  Private (static) functions need not, but it is
+public functions. Private (static) functions need not, but it is
 recommended that they do.
 
 Functions whose return value is the actual result of a computation, rather
 than an indication of whether the computation succeeded, are not subject to
-this rule.  Generally they indicate failure by returning some out-of-range
-result.  Typical examples would be functions that return pointers; they use
+this rule. Generally they indicate failure by returning some out-of-range
+result. Typical examples would be functions that return pointers; they use
 NULL or the ERR_PTR mechanism to report failure.
 
 
-		Chapter 17:  Don't re-invent the kernel macros
+## Chapter 17:  Don't re-invent the kernel macros
 
 The header file include/linux/kernel.h contains a number of macros that
 you should use, rather than explicitly coding some variant of them yourself.
 For example, if you need to calculate the length of an array, take advantage
 of the macro
 
+```C
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+```
 
 Similarly, if you need to calculate the size of some structure member, use
 
+```C
 	#define FIELD_SIZEOF(t, f) (sizeof(((t*)0)->f))
+```
 
 There are also min() and max() macros that do strict type checking if you
-need them.  Feel free to peruse that header file to see what else is already
+need them. Feel free to peruse that header file to see what else is already
 defined that you shouldn't reproduce in your code.
 
 
-		Chapter 18:  Editor modelines and other cruft
+## Chapter 18:  Editor modelines and other cruft
 
 Some editors can interpret configuration information embedded in source files,
-indicated with special markers.  For example, emacs interprets lines marked
+indicated with special markers. For example, emacs interprets lines marked
 like this:
 
 	-*- mode: c -*-
 
 Or like this:
 
+```C
 	/*
 	Local Variables:
 	compile-command: "gcc -DMAGIC_DEBUG_FLAG foo.c"
 	End:
 	*/
+```
 
 Vim interprets markers that look like this:
 
 	/* vim:set sw=8 noet */
 
-Do not include any of these in source files.  People have their own personal
-editor configurations, and your source files should not override them.  This
-includes markers for indentation and mode configuration.  People may use their
+Do not include any of these in source files. People have their own personal
+editor configurations, and your source files should not override them. This
+includes markers for indentation and mode configuration. People may use their
 own custom mode, or may have some other magic method for making indentation
 work correctly.
 
 
-		Chapter 19:  Inline assembly
+## Chapter 19:  Inline assembly
 
 In architecture-specific code, you may need to use inline assembly to interface
-with CPU or platform functionality.  Don't hesitate to do so when necessary.
-However, don't use inline assembly gratuitously when C can do the job.  You can
+with CPU or platform functionality. Don't hesitate to do so when necessary.
+However, don't use inline assembly gratuitously when C can do the job. You can
 and should poke hardware from C when possible.
 
 Consider writing simple helper functions that wrap common bits of inline
-assembly, rather than repeatedly writing them with slight variations.  Remember
+assembly, rather than repeatedly writing them with slight variations. Remember
 that inline assembly can use C parameters.
 
 Large, non-trivial assembly functions should go in .S files, with corresponding
-C prototypes defined in C header files.  The C prototypes for assembly
+C prototypes defined in C header files. The C prototypes for assembly
 functions should use "asmlinkage".
 
 You may need to mark your asm statement as volatile, to prevent GCC from
-removing it if GCC doesn't notice any side effects.  You don't always need to
+removing it if GCC doesn't notice any side effects. You don't always need to
 do so, though, and doing so unnecessarily can limit optimization.
 
 When writing a single inline assembly statement containing multiple
@@ -861,30 +880,32 @@ instructions, put each instruction on a separate line in a separate quoted
 string, and end each string except the last with \n\t to properly indent the
 next instruction in the assembly output:
 
+```C
 	asm ("magic %reg1, #42\n\t"
 	     "more_magic %reg2, %reg3"
 	     : /* outputs */ : /* inputs */ : /* clobbers */);
+```
 
 
-		Chapter 20: Conditional Compilation
+## Chapter 20: Conditional Compilation
 
 Wherever possible, don't use preprocessor conditionals (#if, #ifdef) in .c
-files; doing so makes code harder to read and logic harder to follow.  Instead,
+files; doing so makes code harder to read and logic harder to follow. Instead,
 use such conditionals in a header file defining functions for use in those .c
 files, providing no-op stub versions in the #else case, and then call those
-functions unconditionally from .c files.  The compiler will avoid generating
+functions unconditionally from .c files. The compiler will avoid generating
 any code for the stub calls, producing identical results, but the logic will
 remain easy to follow.
 
 Prefer to compile out entire functions, rather than portions of functions or
-portions of expressions.  Rather than putting an ifdef in an expression, factor
+portions of expressions. Rather than putting an ifdef in an expression, factor
 out part or all of the expression into a separate helper function and apply the
 conditional to that function.
 
 If you have a function or variable which may potentially go unused in a
 particular configuration, and the compiler would warn about its definition
 going unused, mark the definition as __maybe_unused rather than wrapping it in
-a preprocessor conditional.  (However, if a function or variable *always* goes
+a preprocessor conditional. (However, if a function or variable *always* goes
 unused, delete it.)
 
 Within code, where possible, use the IS_ENABLED macro to convert a Kconfig
@@ -896,14 +917,14 @@ symbol into a C boolean expression, and use it in a normal C conditional:
 
 The compiler will constant-fold the conditional away, and include or exclude
 the block of code just as with an #ifdef, so this will not add any runtime
-overhead.  However, this approach still allows the C compiler to see the code
+overhead. However, this approach still allows the C compiler to see the code
 inside the block, and check it for correctness (syntax, types, symbol
-references, etc).  Thus, you still have to use an #ifdef if the code inside the
+references, etc). Thus, you still have to use an #ifdef if the code inside the
 block references symbols that will not exist if the condition is not met.
 
 At the end of any non-trivial #if or #ifdef block (more than a few lines),
 place a comment after the #endif on the same line, noting the conditional
-expression used.  For instance:
+expression used. For instance:
 
 	#ifdef CONFIG_SOMETHING
 	...
