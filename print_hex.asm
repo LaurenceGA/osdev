@@ -13,7 +13,7 @@ hexloop:
 	jle modstr
 	add cx, 7	; offset to letters
 
-modstr	add [hex_string+bx], cx	; Modify our hex_string
+modstr:	add [hex_string+bx], cx	; Modify our hex_string
 	shr ax, 4	; Move number down
 
 	add bx, -1
