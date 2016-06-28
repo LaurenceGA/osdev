@@ -9,9 +9,9 @@ hexloop:
 	mov cx, 0xf	; extract the lowest 4 bits from argumnet
 	and cx, ax
 
-	cmp cx, 9
+	cmp cx, 9	; See if it should be a letter or digit
 	jle modstr
-	add cx, 7	; offset to letters
+	add cx, 7	; offset to letters if needed
 
 modstr:	add [hex_string+bx], cx	; Modify our hex_string
 	shr ax, 4	; Move number down
