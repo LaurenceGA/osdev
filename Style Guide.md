@@ -43,23 +43,19 @@ is less preferable to this:
 	do_something_everytime;
 ```
 
-Multiple assignments on a single line are also less-preferable.
-
 Whitespace should not be left at the end of a line, and there should be a new
-line at the end of each file.
+line at the end of a file.
 
 ## Chapter 2: Breaking long lines and strings
 
-Coding style is all about readability and maintainability using commonly
-available tools. The preferred limit on the length of a line is 80 characters,
-however, if by extending this limit you increase the readability of the code,
-then may do so.
+The preferred limit on the length of a line is 80 characters, however, if by
+extending this limit you increase the readability of the code, then you may do so.
 
 ## Chapter 3: Placing Braces and Spaces
 
-The other issue that always comes up in C styling is the placement of
-braces. The preferred way, is to put the opening brace last on the line, and put
-the closing brace first, thusly:
+The other issue that always comes up in C styling is the placement of braces.
+The preferred way, is to put the opening brace last on the line, and put the
+closing brace first, thusly:
 
 ```C
 	if (x is true) {
@@ -83,9 +79,8 @@ the closing brace first, thusly:
 	}
 ```
 
-In general, the closing brace should be on a line of it's own, except for when
-there is a followup to the previous statement, as in do .. while, and if ...
-else, i.e.:
+The only time a closing brace shouldn't be on a lint of it's own is when it's a
+part of a do {} while loop, or in the middle of a conditional statement, e.g.:
 
 ```C
 	do {
@@ -94,14 +89,13 @@ else, i.e.:
 
 	if (x == y) {
 		..
-	} else if (x > y) {
-		...
 	} else {
 		....
 	}
 ```
 
-Do not unnecessarily use braces where there is a single statement, e.g.:
+Do not unnecessarily use braces on a single statement. This does not apply if
+only one of the branches contains a single statement, e.g.:
 
 ```C
 	if (condition)
@@ -110,13 +104,8 @@ Do not unnecessarily use braces where there is a single statement, e.g.:
 		do_this();
 	else
 		do_that();
-```
 
-This does not apply if only one branch of a conditional statement is a single
-statement, in which case do this:
-
-```C
-	if (condition) {
+	if (some_condition) {
 		do_this();
 		do_that();
 	} else {
@@ -131,16 +120,10 @@ Use a space after these:
 	if, switch, case, for, do, while
 ```
 
-but not with sizeof, typeof, alignof, or \_\_attribute\_\_. E.g.,
+Spaces should not be used right after, or right before, parenthises, other than
+in the above exceptions.
 
-```C
-	s = sizeof(struct file);
-```
-
-Also note that spaces should not be used right after, or right before, a
-parenthises.
-
-The preferred placement of the "\*" when declaring a pointer, is to put it next
+The preferred placement of the '\*' when declaring a pointer, is to put it next
 to the variable, and not the type, as in:
 
 ```C
@@ -155,16 +138,11 @@ Use one space on each side of most binary and ternary operators, such as these:
 	=  +  -  <  >  *  /  %  |  &  ^  <=  >=  ==  !=  ?  :
 ```
 
-but no space after unary operators:
+but no space after/before unary operators, and element selectors:
 
 ```C
-	&  *  +  -  ~  !  -- ++
+	&  *  +  -  ~  !  -- ++ . ->
 ```
-
-The post-increment and post-decrement operators should also not have any space's
-before them.
-
-No spaces around the '.' and "->" structure member operators.
 
 ## Chapter 4: Naming
 
@@ -184,18 +162,17 @@ Global and #define'd values should be all uppercase, as in:
 	const int GLOBALVAL = 10;
 ```
 
-###Chapter 5: Typedefs
+## Chapter 5: Typedefs
 
 Typedefs shouldn't be used. They add an extra layer of obscurity that should be
 avoided.
 
 ## Chapter 6: Functions
 
-The point of a function is to do one thing, and that one thing only. If you find
-yourself doing too much in a single function, try to split it up into two, or
-more, functions. The exception to this is when a single function has a long
-switch statement, or multiple if/else if statements that cannot be moved out of
-the function.
+The point of a function is to do one thing, and one thing only. If you find
+that a function is doing too much, try to split it up into two, or more, functions.
+The exception to this is when a single function has a long switch statement, or
+multiple if/else if statements that cannot be moved out of the function.
 
 ## Chapter 7: Centralized exiting of functions
 
@@ -230,21 +207,12 @@ label a name which says what that goto does, or why it exists.
 
 ## Chapter 8: Commenting
 
-Generally, you want your comments to tell WHAT your code does, not HOW.
-Also, try to avoid putting comments inside a function body: if the
-function is so complex that you need to separately comment parts of it,
-you should probably go back to chapter 6 for a while. You can make
-small comments to note or warn about something particularly clever (or
-ugly), but try to avoid excess. Instead, put the comments at the head
-of the function, telling people what it does, and possibly WHY it does
-it.
-
-The preferred style for long (multi-line) comments is:
+Generally, you want comments to tell WHAT your code does, not HOW.
 
 ```C
 	/*
 	 * This is the preferred style for multi-line
-	 * comments in the Linux kernel source code.
+	 * comments.
 	 * Please use it consistently.
 	 *
 	 * Description:  A column of asterisks on the left side,
@@ -261,42 +229,11 @@ item, explaining its use.
 
 You shouldn't inline functions that have more than 3 lines of code in them.
 
-## Chapter 10: Function return values and names
+Don't use inline assembly if C can do the job. You should poke hardware from C
+when possible. Large, non-trivial assembly functions should go in .asm files,
+with corresponding C prototypes defined in header files.
 
-One of the most common return value is indicating whether the function succeeded
-or failed. Such a value can be represented as an error-code integer (-Exxx =
-failure, 0 = success) or a "succeeded" boolean (0 = failure, non-zero = success).
-
-Mixing up these two sorts of representations is a common source of
-difficult-to-find bugs, because C doesn't have a common way of distinguishing
-between the two types. To help prevent such bugs, always follow this convention:
-
->	If the name of a function is an action or an imperative command,
->	the function should return an error-code integer. If the name
->	is a predicate, the function should return a "succeeded" boolean.
-
-For example, "add work" is a command, and the add_work() function returns 0
-for success or -EBUSY for failure. In the same way, "PCI device present" is
-a predicate, and the pci_dev_present() function returns 1 if it succeeds in
-finding a matching device or 0 if it doesn't.
-
-Functions whose return value is the actual result of a computation, rather
-than an indication of whether the computation succeeded, are not subject to
-this rule. Generally they indicate failure by returning some out-of-range
-result. Typical examples would be functions that return pointers; they use
-NULL or the ERR_PTR mechanism to report failure.
-
-## Chapter 11:  Inline assembly
-
-Don't use inline assembly gratuitously when C can do the job. You can
-and should poke hardware from C when possible.
-
-Large, non-trivial assembly functions should go in .asm files, with corresponding
-C prototypes defined in C header files
-
-You may need to mark your asm statement as volatile, to prevent GCC from
-removing it if GCC doesn't notice any side effects. You don't always need to
-do so, though, and doing so unnecessarily can limit optimization.
+Don't unneccessarily mark asm as volatile.
 
 When writing a single inline assembly statement containing multiple
 instructions, put each instruction on a separate line in a separate quoted
@@ -309,20 +246,37 @@ next instruction in the assembly output:
 	     : /* outputs */ : /* inputs */ : /* clobbers */);
 ```
 
-## Chapter 12: Conditional Compilation
+## Chapter 10: Function return values and names
 
-Wherever possible, don't use preprocessor conditionals (#if, #ifdef) in .c
-files; doing so makes code harder to read and logic harder to follow. Instead,
-use such conditionals in a header file defining functions for use in those .c
-files, providing no-op stub versions in the #else case, and then call those
-functions unconditionally from .c files. The compiler will avoid generating
-any code for the stub calls, producing identical results, but the logic will
-remain easy to follow.
+One of the most common return value is indicating whether the function succeeded
+or failed. Such a value can be represented as an error-code integer (-Exxx =
+failure, 0 = success) or a "succeeded" boolean (0 = failure, non-zero = success).
 
-Prefer to compile out entire functions, rather than portions of functions or
-portions of expressions. Rather than putting an ifdef in an expression, factor
-out part or all of the expression into a separate helper function and apply the
-conditional to that function.
+Mixing up these two sorts of representations is a ource of difficult-to-find bugs,
+as C doesn't have a common way of distinguishing between the two types. To help
+prevent such bugs, follow this:
+
+>	If the name of a function is an action or an imperative command,
+>	the function should return an error-code integer. If the name
+>	is a predicate, the function should return a "succeeded" boolean.
+
+For example, "add work" is a command, and the add_work() function returns 0
+for success or -EBUSY for failure. In the same way, "PCI device present" is
+a predicate, and the pci_dev_present() function returns 1 if it succeeds in
+finding a matching device or 0 if it doesn't.
+
+Functions whose return value is the actual result of a computation, rather
+than an indication of whether the computation succeeded, are not subject to
+this rule.
+
+## Chapter 11: Conditional Compilation
+
+It is preferred that you don't use preprocessor conditionals in .c files, as
+doing so makes the code harder to read, and logic harder to follow. If you must
+use them, place them in a header file which you can then include in those .c
+files. It is also preferred that, if you use a preprocessor conditional, that
+you use it around the entire function, instead of just a few lines in the middle
+of the function.
 
 At the end of any non-trivial #if or #ifdef block (more than a few lines),
 place a comment after the #endif on the same line, noting the conditional
