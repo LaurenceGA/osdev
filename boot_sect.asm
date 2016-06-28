@@ -5,12 +5,16 @@
 	mov bx, hello_message	; Print hello
 	call print_string
 
+	mov ax, 0x0af2
+	call print_hex
+
 	mov bx, goodbye_message	; Print goodbye
 	call print_string
 
 	jmp $	; Infinite loop
 
 %include "print_string.asm"	; Make sure we can print strings
+%include "print_hex.asm"
 
 ; data
 CR equ 0xd	; '\r'

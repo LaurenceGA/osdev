@@ -6,13 +6,14 @@ hexloop:
 	cmp bx, 2	; See if counter has finished
 	jl endloop
 
-	mov dx, hex_string	; Find the address we want
-	add dx, bx
-
 	mov cx, 0xf	; extract the lowest 4 bits from argumnet
 	and cx, ax
 
-	add [hex_string+bx], cx	; Modify our hex_string
+	cmp cx, 9
+	jle modstr
+	add cx, 7	; offset to letters
+
+modstr	add [hex_string+bx], cx	; Modify our hex_string
 	shr ax, 4	; Move number down
 
 	add bx, -1
