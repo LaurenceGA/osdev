@@ -23,6 +23,19 @@ endloop:
 	mov bx, hex_string
 	call print_string
 
+	; Now we need to reset the string so it can be used again
+	mov bx, 5
+
+resetloop:
+	cmp bx, 2
+	jl return
+
+	mov byte [hex_string+bx], '0'	; Set to '0'
+
+	add bx, -1
+	jmp resetloop
+
+return:
 	popa
 	ret
 ; Data
