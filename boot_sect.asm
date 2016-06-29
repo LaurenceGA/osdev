@@ -2,6 +2,8 @@
 ; A simple boot sector program that says hello and then goodbye
 ;
 [org 0x7c00]
+; global _start
+; _start:
 	mov bp, 0x9000		; Move the stack out of the way
 	mov sp, bp
 
@@ -26,6 +28,7 @@
 	jmp $	; Infinite loop
 
 %include "print_string.asm"	; Make sure we can print strings
+; extern print_string
 %include "print_hex.asm"
 %include "disk_load.asm"
 %include "pm/gdt.asm"

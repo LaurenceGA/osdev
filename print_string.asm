@@ -1,4 +1,5 @@
 ; Prints out a string. String location passed through bx
+global print_string	; Allow this to be accessed elsewhere
 print_string:
 	pusha	; Save registers
 	mov ah, 0x0e	; BIOS tele-type output
