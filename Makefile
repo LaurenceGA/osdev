@@ -9,10 +9,8 @@ ASFLAGS = -f bin -o $(BINFILE)
 EMU := $(shell command -v qemu-system-i386 2>/dev/null)
 EMUFLAGS = -drive file=$(BINFILE),index=0,media=disk,format=raw
 
-# If the user hasn't symlinked qemu to something, then use the QEmu for the
-# architecture that we're building for, otherwise use the symlinked version.
 ifndef EMU
-	$(error "QEmu doesn't appear to be installed")
+	$(error "QEMU doesn't appear to be installed")
 else
 	EMU = qemu-system-i386
 endif
