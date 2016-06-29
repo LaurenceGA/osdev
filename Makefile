@@ -1,10 +1,11 @@
 AS = nasm
 
-ASFILE  = boot.asm
-BINFILE = $(ASFILE:%.asm=%.bin)
+BOOT     = boot.asm
+ASFILES := $(wildcard ./*/*.asm)
+ASFILES += $(wildcard ./*.asm)
+BINFILE  = $(ASFILE:%.asm=%.bin)
 
-ASFLAGS = -f bin -o $(BINFILE)
-
+ASFLAGS = -f bin
 
 EMU := $(shell command -v qemu-system-i386 2>/dev/null)
 EMUFLAGS = -drive file=$(BINFILE),index=0,media=disk,format=raw
@@ -14,15 +15,16 @@ ifndef EMU
 else
 	EMU = qemu-system-i386
 endif
+
 RM = rm
 
-# If no target is specified, then build the project.
-default: build
+# No target specified, so just assemble the file.
+default: $(BINFILE)
 
-build:
-	$(AS) $(ASFILE) $(ASFLAGS)
+$(BINFILE): $(BOOT) $(ASFILES)
+	$(AS) $< -o $@
 
-run: build
+run: $(BINFILE)
 	$(EMU) $(EMUFLAGS)
 
 clean:
