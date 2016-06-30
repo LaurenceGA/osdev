@@ -1,5 +1,5 @@
 AS=nasm
-ASFILE=boot_sect.asm
+ASFILE=boot.asm
 BINFILE=$(ASFILE:%.asm=%.bin)
 ASFLAGS=-f bin -o $(BINFILE)
 
