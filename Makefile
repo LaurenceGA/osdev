@@ -1,32 +1,25 @@
-AS = nasm
+AS=nasm
+ASFILE=boot.asm
+BINFILE=$(ASFILE:%.asm=%.bin)
+ASFLAGS=-f bin -o $(BINFILE)
 
-ASFILE  = boot.asm
-BINFILE = $(ASFILE:%.asm=%.bin)
+CC=gcc
+CFLAGS=-c -Wall -Werror
 
-ASFLAGS = -f bin -o $(BINFILE)
+LD=ld
 
+EMU=qemu-system-i386
+EMUFLAGS=-drive file=$(BINFILE),index=0,media=disk,format=raw
 
-EMU := $(shell command -v qemu-system-i386 2>/dev/null)
-EMUFLAGS = -drive file=$(BINFILE),index=0,media=disk,format=raw
+RM=rm -f
 
-# If the user hasn't symlinked qemu to something, then use the QEmu for the
-# architecture that we're building for, otherwise use the symlinked version.
-ifndef EMU
-	$(error "QEmu doesn't appear to be installed")
-else
-	EMU = qemu-system-i386
-endif
-RM = rm
+default: $(BINFILE)
 
-# If no target is specified, then build the project.
-default: build
-
-build:
+$(BINFILE): $(ASFILE)
 	$(AS) $(ASFILE) $(ASFLAGS)
 
-run: build
+run: $(BINFILE)
 	$(EMU) $(EMUFLAGS)
 
 clean:
 	$(RM) $(BINFILE)
-
