@@ -1,0 +1,1 @@
+ld -o boot.bin -m elf_i386 -Ttext 0x0000 boot_sect.o print_string.o --oformat binary
