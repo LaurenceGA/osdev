@@ -1,6 +1,6 @@
 AS = nasm
 
-BOOT     = boot.asm
+BOOT     = boot_sect.asm
 ASFILES := $(wildcard ./*/*.asm)
 ASFILES += $(wildcard ./*.asm)
 BINFILE  = $(ASFILE:%.asm=%.bin)
