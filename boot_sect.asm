@@ -7,6 +7,10 @@
 	mov bp, 0x9000		; Move the stack out of the way
 	mov sp, bp
 
+	; mov bx, 0x7c0
+	; mov cs, bx
+	; mov ds, bx
+
 	mov bx, hello_message	; Print hello
 	call print_string
 
