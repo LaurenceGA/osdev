@@ -28,7 +28,7 @@ RM = rm
 default: $(BINFILE)
 
 $(BINFILE): $(ASFILES)
-	$(AS) $(BOOT) -o $(BINFILE)
+	$(AS) $(ASFLAGS) $(BOOT) -o $(BINFILE)
 
 run: $(BINFILE)
 	$(EMU) $(EMUFLAGS)
