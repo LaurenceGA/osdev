@@ -74,7 +74,7 @@ kernel_entry.o: kernel_entry.asm
 
 # Remove all but source files
 clean:
-	$(RM) *.o *.bin os-image *.dis
+	$(RM) *.o *.bin $(IMAGE) *.dis
 
 # Disassemble our kernel - might be useful for debugging .
 kernel.dis: kernel.bin

@@ -1,8 +1,8 @@
-
-char *VIDEO_MEMORY = (char *) 0xb8000;
+#include "Video.h"
 
 int main() {
-        *VIDEO_MEMORY = 'X';
+	init_terminal();
+	terminal_puts("Welcome to kernel world!\n");
 
-        return 0;
+	return 0;
 }
