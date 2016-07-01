@@ -1,31 +1,24 @@
+
 ;
 ; A simple boot sector program that says hello and then goodbye
 ;
 [org 0x7c00]
-; global _start
-; _start:
+KERNEL_OFFSET equ 0x1000	; Where we will load the kernel
+	mov [BOOT_DRIVE], dl	; The bootloader stores the boot drive
+				; in dl, so we grab that
+
 	mov bp, 0x9000		; Move the stack out of the way
 	mov sp, bp
 
-	; mov bx, 0x7c0
-	; mov cs, bx
-	; mov ds, bx
-
-	mov bx, hello_message	; Print hello
+	mov bx, msg_real_mode	; Print welcoming message
 	call print_string
 
-	; mov [BOOT_DRIVE], dl
+	call load_kernel
 
 	; mov bx, 0x9000		; 5 secotrs 0x0000(ES):0x9000(BX)
 	; mov dh, 5
 	; mov dl, [BOOT_DRIVE]
 	; call disk_load
-
-	; mov ax, [0x9000]	; Print first laoded word
-	; call print_hex
-
-	; mov ax, [0x9000+512]	; Print first laoded word
-	; call print_hex
 
 	call switch_to_pm
 
@@ -39,11 +32,25 @@
 %include "pm/switch_to_pm.asm"
 %include "pm/print_string_pm.asm"
 
+[bits 16]
+load_kernel:
+	mov bx, msg_loading_kernel	; Say what's happening
+	call print_string
+
+	mov bx, KERNEL_OFFSET	; Where we will load in the kernel
+	mov dh, 14		; Number of sectors to load
+	mov dl, [BOOT_DRIVE]	; Where to look for kernel
+	call disk_load
+
+	ret
+
 [bits 32]
 ; Where we end up after calling the switch
 BEGIN_PM:
-	mov ebx, goodbye_message
+	mov ebx, msg_protected_mode
 	call print_string_pm
+
+	call KERNEL_OFFSET
 
 	jmp $	; Hang
 
@@ -52,15 +59,12 @@ BOOT_DRIVE: db 0
 
 CR: equ 0xd	; '\r'
 LF: equ 0xa	; '\n'
-hello_message:
-	db 'Hi there!', CR, LF, 'Switching to protected mode...', CR, LF, 0
-goodbye_message:
-	db 'In protected mode!!', 0
+msg_real_mode:
+	db 'Started in 16-bit real mode', CR, LF, 0
+msg_loading_kernel:
+	db 'Loading kernel into RAM', CR, LF, 0
+msg_protected_mode:
+	db 'In 32-bit protected mode', 0
 
 times 510-($-$$) db 0	; pad program out to 510th byte
 dw 0xaa55		; Magic number tells the boot loader that this is a boot sector
-
-; Make up some data
-times 256 dw 0xdada	; 1 sector
-times 256 dw 0xface
-times 512*4 dw 0	; Chuck in 4 more sectors
