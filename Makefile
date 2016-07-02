@@ -4,7 +4,8 @@ AS=nasm
 ASFLAGS = -f bin
 
 # Boot sector code
-BOOT    = boot.asm
+BOOTDIR = boot/
+BOOT    = $(BOOTDIR)boot.asm
 ASFILES := $(wildcard ./*/*.asm)
 ASFILES += $(wildcard ./*.asm)
 BINFILE  = $(BOOT:%.asm=%.bin)
@@ -26,16 +27,12 @@ EMUFLAGS=-drive file=os-image,index=0,media=disk,format=raw
 # the -f options suppresses warnings if a file is not present
 RM=rm -f
 
-# ifndef EMU
-	# $(error "QEMU doesn't appear to be installed")
-# endif
-
 # No target specified, so just create the OS image.
 default: os-image
 
 # Compilation of our boot sector
 $(BINFILE): $(ASFILES)
-	$(AS) $(ASFLAGS) $(BOOT) -o $(BINFILE)
+	$(AS) $(ASFLAGS) $(BOOT) -I $(BOOTDIR) -o $(BINFILE)
 
 # Just runs emu with our disk image
 run: os-image
@@ -48,7 +45,7 @@ os-image: $(BINFILE) kernel.bin disk_space.bin
 
 # Just out extra space padding. Without this, if we tried to read too much
 # we would throw an error
-disk_space.bin: nullbytes.asm
+disk_space.bin: $(BOOTDIR)nullbytes.asm
 	$(AS) $(ASFLAGS) $< -o $@
 
 # It's very important that the dependencies are in this order so they are stuck
@@ -56,16 +53,16 @@ disk_space.bin: nullbytes.asm
 # This compiles our kernel. It's also important that it's in i386 mode format
 # compatability with our other code
 # The linker looks for _start, but we don't have one so we let say
+# --entry main so it knows where our start point is (main function)
 kernel.bin: kernel_entry.o kernel.o
-	# --entry main so it knows where our start point is (main function)
 	$(LD) -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary --entry main
 
 # Create the object of our main kernel code
-kernel.o: kernel.c
+kernel.o: kernel/src/kernel.c
 	$(CC) -ffreestanding $(CFLAGS) -c $< -o $@
 
 # Entry file that ensures we just straight into our kernel's main method
-kernel_entry.o: kernel_entry.asm
+kernel_entry.o: kernel/kernel_entry.asm
 	$(AS) $< -f elf -o $@
 
 # Remove all but source files
