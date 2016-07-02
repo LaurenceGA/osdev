@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "string.h"
+
 static uint16_t *VIDEO_MEMORY = (uint16_t *) 0xB8000;
 static const size_t VGA_HEIGHT = 25;
 static const size_t VGA_WIDTH  = 80;
@@ -30,13 +32,6 @@ size_t terminal_column;
 
 uint8_t terminal_colour;
 uint16_t *terminal_buffer;
-
-size_t strlen(const char *string) {
-	size_t len = 0;
-	while (string[len])
-		len++;
-	return len;
-}
 
 uint8_t make_colour(enum COLOUR fg, enum COLOUR bg) {
 	return fg | bg << 4;
