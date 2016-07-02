@@ -17,7 +17,7 @@ KERNEL   := $(KDIR)kernel_entry.asm
 KERNELO  := $(KERNEL:%.asm=%.o)
 SRCFILES := $(wildcard $(KDIR)*.c)
 SRCFILES += $(wildcard $(SRCDIR)*.c)
-SRCFILES += $(wildcard $(SRCDIR)string/*.c)
+SRCFILES += $(wildcard $(SRCDIR)*/*.c)
 SRCFILES += $(CKERNEL)
 OBJFILES := $(SRCFILES:%.c=%.o)
 
@@ -78,7 +78,7 @@ kernel_and_link: $(KERNELO) $(OBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # Create the object of our main kernel code
-.c.o:
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Entry file that ensures we just straight into our kernel's main method
