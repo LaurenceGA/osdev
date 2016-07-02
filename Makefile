@@ -1,37 +1,74 @@
+# Assembler of chouce
 AS=nasm
+# Assemble to flat binary
 ASFLAGS = -f bin
 
-BOOT     = boot.asm
+# Boot sector code
+BOOTDIR = boot/
+BOOT    = $(BOOTDIR)boot.asm
 ASFILES := $(wildcard ./*/*.asm)
 ASFILES += $(wildcard ./*.asm)
-BINFILE  = $(ASFILE:%.asm=%.bin)
+BINFILE  = $(BOOT:%.asm=%.bin)
 
+# C code is compiled using gcc with the C standard of 2011
+# It's importan that it's in 32 bit mode to be compatible with our os
 CC=gcc
-CFLAGS=-c -Wall -Werror
+STD=c11
+CFLAGS=-c -std=$(STD) -m32 -Wall -Werror
 
 LD=ld
 
-EMU := $(shell command -v qemu-system-i386 >>/dev/null)
-EMUFLAGS=-drive file=$(BINFILE),index=0,media=disk,format=raw
+# Qemu is the cpu emulator used. The flags ensure it knows what kind of
+# disk image it's getting. Without them is gives a warning
+# EMU := $(shell command -v qemu-system-i386 >>/dev/null)
+EMU = qemu-system-i386
+EMUFLAGS=-drive file=os-image,index=0,media=disk,format=raw
 
+# the -f options suppresses warnings if a file is not present
 RM=rm -f
 
-ifndef EMU
-	$(error "QEMU doesn't appear to be installed")
-else
-	EMU = qemu-system-i386
-endif
+# No target specified, so just create the OS image.
+default: os-image
 
-RM = rm
-
-# No target specified, so just assemble the file.
-default: $(BINFILE)
-
+# Compilation of our boot sector
 $(BINFILE): $(ASFILES)
-	$(AS) $(ASFLAGS) $(BOOT) -o $(BINFILE)
+	$(AS) $(ASFLAGS) $(BOOT) -I $(BOOTDIR) -o $(BINFILE)
 
-run: $(BINFILE)
+# Just runs emu with our disk image
+run: os-image
 	$(EMU) $(EMUFLAGS)
 
+# Sticks our component binaries (boot sector, kernel and extra space) together
+# to create our disk image
+os-image: $(BINFILE) kernel.bin disk_space.bin
+	cat $^ > $@
+
+# Just out extra space padding. Without this, if we tried to read too much
+# we would throw an error
+disk_space.bin: $(BOOTDIR)nullbytes.asm
+	$(AS) $(ASFLAGS) $< -o $@
+
+# It's very important that the dependencies are in this order so they are stuck
+# together properly (entry before kernel)
+# This compiles our kernel. It's also important that it's in i386 mode format
+# compatability with our other code
+# The linker looks for _start, but we don't have one so we let say
+# --entry main so it knows where our start point is (main function)
+kernel.bin: kernel_entry.o kernel.o
+	$(LD) -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary --entry main
+
+# Create the object of our main kernel code
+kernel.o: kernel/src/kernel.c
+	$(CC) -ffreestanding $(CFLAGS) -c $< -o $@
+
+# Entry file that ensures we just straight into our kernel's main method
+kernel_entry.o: kernel/kernel_entry.asm
+	$(AS) $< -f elf -o $@
+
+# Remove all but source files
 clean:
-	$(RM) $(BINFILE)
+	$(RM) *.o *.bin os-image *.dis
+
+# Disassemble our kernel - might be useful for debugging .
+kernel.dis: kernel.bin
+	ndisasm -b 32 $< > $@
