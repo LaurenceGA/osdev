@@ -24,13 +24,12 @@ KERNEL_OFFSET equ 0x1000	; Where we will load the kernel
 
 	jmp $	; Infinite loop
 
-%include "print_string.asm"	; Make sure we can print strings
-; extern print_string
-%include "print_hex.asm"
-%include "disk_load.asm"
-%include "pm/gdt.asm"
-%include "pm/switch_to_pm.asm"
-%include "pm/print_string_pm.asm"
+%include "real/print_string.asm"	; Make sure we can print strings
+%include "real/print_hex.asm"
+%include "real/disk_load.asm"
+%include "protected/gdt.asm"
+%include "protected/switch_to_pm.asm"
+%include "protected/print_string_pm.asm"
 
 [bits 16]
 load_kernel:

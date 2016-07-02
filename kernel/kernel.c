@@ -1,28 +1,42 @@
-#include "string.h"
-#include "Video.h"
+#include <stddef.h>
+#include <stdint.h>
 
-static const uint16_t *VIDEO_MEMORY = (uint16_t *) 0xB8000;
+static uint16_t *VIDEO_MEMORY = (uint16_t *) 0xB8000;
 static const size_t VGA_HEIGHT = 25;
 static const size_t VGA_WIDTH  = 80;
 
 enum COLOUR {
-        COLOUR_BLACK         =  0,
-        COLOUR_BLUE          =  1,
-        COLOUR_GREEN         =  2,
-        COLOUR_CYAN          =  3,
-        COLOUR_RED           =  4,
-        COLOUR_MAGENTA       =  5,
-        COLOUR_BROWN         =  6,
-        COLOUR_LIGHT_GREY    =  7,
-        COLOUR_DARK_GREY     =  8,
-        COLOUR_LIGHT_BLUE    =  9,
-        COLOUR_LIGHT_GREEN   = 10,
-        COLOUR_LIGHT_CYAN    = 11,
-        COLOUR_LIGHT_RED     = 12,
-        COLOUR_LIGHT_MAGENTA = 13,
-        COLOUR_LIGHT_BROWN   = 14,
-        COLOUR_WHITE         = 15,
+	COLOUR_BLACK		= 0,
+	COLOUR_BLUE		= 1,
+	COLOUR_GREEN		= 2,
+	COLOUR_CYAN		= 3,
+	COLOUR_RED		= 4,
+	COLOUR_MAGENTA		= 5,
+	COLOUR_BROWN		= 6,
+	COLOUR_LIGHT_GREY	= 7,
+	COLOUR_DARK_GREY	= 8,
+	COLOUR_LIGHT_BLUE	= 9,
+	COLOUR_LIGHT_GREEN	= 10,
+	COLOUR_LIGHT_CYAN	= 11,
+	COLOUR_LIGHT_RED	= 12,
+	COLOUR_LIGHT_MAGENTA	= 13,
+	COLOUR_LIGHT_BROWN	= 14,
+	COLOUR_WHITE		= 15,
 };
+ 
+
+size_t terminal_row;
+size_t terminal_column;
+
+uint8_t terminal_colour;
+uint16_t *terminal_buffer;
+
+size_t strlen(const char *string) {
+	size_t len = 0;
+	while (string[len])
+		len++;
+	return len;
+}
 
 uint8_t make_colour(enum COLOUR fg, enum COLOUR bg) {
 	return fg | bg << 4;
@@ -59,12 +73,19 @@ void terminal_mvputc(char c, uint8_t colour, size_t col, size_t row) {
 }
 
 void terminal_putc(char c) {
-        terminal_mvputc(c, terminal_colour, terminal_column, terminal_row);
+	if (c == '\n') {
+		goto down_row;
+	} else if (c == '\r') {
+		terminal_column = 0;
+		return;
+	} else
+		terminal_mvputc(c, terminal_colour, terminal_column, terminal_row);
 
-        if (++terminal_column == VGA_WIDTH) {
-                terminal_column = 0;
-                if (++terminal_row == VGA_HEIGHT)
-                        terminal_row = 0;
+	if (++terminal_column == VGA_WIDTH) {
+		terminal_column = 0;
+down_row:
+		if (++terminal_row == VGA_HEIGHT)
+			terminal_row = 0;
         }
 }
 
@@ -74,3 +95,10 @@ void terminal_puts(const char *str) {
 		terminal_putc(str[i]);
 }
 
+int main() {
+	init_terminal();
+	terminal_puts("Welcome to kernel world!\n");
+	terminal_puts("Here we can do all sorts\n\rof fun things");
+
+	return 0;
+}
