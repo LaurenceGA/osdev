@@ -18,7 +18,6 @@ KERNELO  := $(KERNEL:%.asm=%.o)
 SRCFILES := $(wildcard $(KDIR)*.c)
 SRCFILES += $(wildcard $(SRCDIR)*.c)
 SRCFILES += $(wildcard $(SRCDIR)*/*.c)
-SRCFILES += $(CKERNEL)
 OBJFILES := $(SRCFILES:%.c=%.o)
 
 # Assembler of choice. Flags let us assemble to flat binary.
@@ -30,9 +29,9 @@ IMAGE = os_image
 
 # C code is compiled using gcc with the C standard of 2011.
 # It's importan that it's in 32 bit mode to be compatible with our os.
-CC       = gcc
-STD      = c11
-CFLAGS   = -std=$(STD) -m32 -Wall -Werror -ffreestanding -I$(INCDIR)
+CC     = gcc
+STD    = c11
+CFLAGS = -std=$(STD) -m32 -Wall -Werror -ffreestanding -I$(INCDIR)
 
 # The linker w'll use. --entry main so it knows where our start point is (main
 # function).

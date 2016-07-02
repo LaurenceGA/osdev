@@ -7,7 +7,7 @@
 extern void initTerminal();
 
 extern void terminalSetColour(uint8_t);
-extern void terminalMvPutC(char, uint8_t, size_t, size_t);
+extern void terminalMvPutC(char, uint8_t, int, int);
 extern void terminalPutC(char);
 extern void terminalPutS(const char *);
 

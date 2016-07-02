@@ -4,9 +4,9 @@
 #include "string.h"
 #include "stdio.h"
 
-static void print(const char *data, size_t length) {
-        for (size_t i = 0; i < length; i++)
-                putchar((int) ((const unsigned char *) data)[i]);
+static void print(const char *data, int length) {
+	for (int i = 0; i < length; i++)
+		putchar((int) ((const unsigned char *) data)[i]);
 }
 
 /**
@@ -21,7 +21,7 @@ int printf(const char* restrict format, ...) {
 	va_start(parameters, format);
 
 	int written = 0;
-	size_t amount;
+	int amount;
 	bool rejected_bad_specifier = false;
 
 	while (*format != '\0') {

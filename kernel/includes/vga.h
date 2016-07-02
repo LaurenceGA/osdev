@@ -26,15 +26,5 @@ enum COLOUR {
 	COLOUR_WHITE		= 15,
 };
 
-static inline uint8_t makeColour(enum COLOUR fg, enum COLOUR bg) {
-	return fg | bg << 4;
-}
-
-static inline uint16_t makeVGAEntry(char c, uint8_t colour) {
-        uint16_t c16 = c;
-        uint16_t colour16 = colour;
-        return c16 | colour16 << 8;
-}
-
 #endif // _VGA_H
 

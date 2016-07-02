@@ -2,11 +2,21 @@
 #include "tty.h"
 #include "vga.h"
 
-size_t terminal_row;
-size_t terminal_column;
+int terminal_row;
+int terminal_column;
 
 uint8_t terminal_colour;
 uint16_t *terminal_buffer;
+
+static uint8_t makeColour(enum COLOUR fg, enum COLOUR bg) {
+	return fg | bg << 4;
+}
+
+static uint16_t makeVGAEntry(char c, uint8_t colour) {
+	uint16_t c16 = c;
+	uint16_t colour16 = colour;
+	return c16 | colour16 << 8;
+}
 
 void initTerminal() {
 	terminal_row    = 0;
@@ -15,21 +25,21 @@ void initTerminal() {
 	terminal_colour = makeColour(COLOUR_WHITE, COLOUR_BLACK);
 	terminal_buffer = VIDEO_MEMORY;
 
-	for (size_t y = 0; y < VGA_HEIGHT; y++) {
-		for (size_t x = 0; x < VGA_WIDTH; x++) {
-			const size_t index = y * VGA_WIDTH + x;
+	for (int y = 0; y < VGA_HEIGHT; y++) {
+		for (int x = 0; x < VGA_WIDTH; x++) {
+			const int index = y * VGA_WIDTH + x;
 			terminal_buffer[index] = makeVGAEntry(' ', terminal_colour);
 		}
 	}
 }
 
 void terminalSetColour(uint8_t colour) {
-        terminal_colour = colour;
+	terminal_colour = colour;
 }
 
-void terminalMvPutC(char c, uint8_t colour, size_t col, size_t row) {
-        const size_t index = row * VGA_WIDTH + col;
-        terminal_buffer[index] = makeVGAEntry(c, colour);
+void terminalMvPutC(char c, uint8_t colour, int col, int row) {
+	const int index = row * VGA_WIDTH + col;
+	terminal_buffer[index] = makeVGAEntry(c, colour);
 }
 
 void terminalPutC(char c) {
@@ -47,12 +57,12 @@ void terminalPutC(char c) {
 down_row:
 		if (++terminal_row == VGA_HEIGHT)
 			terminal_row = 0;
-        }
+	}
 }
 
 void terminalPutS(const char *str) {
-	size_t len = strlen(str);
-	for (size_t i = 0; i < len; i++)
+	int len = strlen(str);
+	for (int i = 0; i < len; i++)
 		terminalPutC(str[i]);
 }
 
