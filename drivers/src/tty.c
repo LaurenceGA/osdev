@@ -1,7 +1,6 @@
 #include "string.h"
 #include "tty.h"
 #include "vga.h"
-#include "io.h"
 
 // The current row and column we're on.
 int terminal_row;

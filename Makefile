@@ -2,14 +2,19 @@
 BOOTDIR   = boot
 KERNELDIR = kernel
 DRIVERDIR = drivers
+LIBCDIR   = libc
 
 # Kernel source and include directories
-KERNELINCLUDEDIR := $(KERNELDIR)/includes
-KERNELSRCDIR     := $(KERNELDIR)/src
+KERNELINCLUDESDIR := $(KERNELDIR)/includes
+KERNELSRCDIR      := $(KERNELDIR)/src
 
 # Driver source and include directories
-DRIVERINCLUDEDIR := $(DRIVERDIR)/includes
-DRIVERSRCDIR     := $(DRIVERDIR)/src
+DRIVERINCLUDESDIR := $(DRIVERDIR)/includes
+DRIVERSRCDIR      := $(DRIVERDIR)/src
+
+# Libc source and include directories
+LIBCINCLUDESDIR := $(LIBCDIR)/includes
+LIBCSRCDIR      := $(LIBCDIR)/src
 
 # Boot related code
 BOOTFILE    := $(BOOTDIR)/boot.asm
@@ -41,11 +46,19 @@ DRIVERASMSRCFILES += $(wildcard $(DRIVERSRCDIR)/*.asm)
 DRIVERASMSRCFILES += $(wildcard $(DRIVERSRCDIR)/*/*.asm)
 DRIVERASMOBJFILES := $(DRIVERASMSRCFILES:%.asm=%.o)
 
+# Libc related sourced files
+LIBCSRCFILES := $(wildcard $(LIBCDIR)/*.c)
+LIBCSRCFILES += $(wildcard $(LIBCSRCDIR)/*.c)
+LIBCSRCFILES += $(wildcard $(LIBCSRCDIR)/*/*.c)
+LIBCOBJFILES := $(LIBCSRCFILES:%.c=%.o)
+
 # Header files
-HEADERS := $(wildcard $(KERNELINCLUDEDIR)/*.c)
-HEADERS += $(wildcard $(DRIVERINCLUDEDIR)/*.c)
-HEADERS += $(wildcard $(KERNELINCLUDEDIR)/*/*.c)
-HEADERS += $(wildcard $(DRIVERINCLUDEDIR)/*/*.c)
+HEADERS := $(wildcard $(LIBCINCLUDESDIR)/*.h)
+HEADERS += $(wildcard $(LIBCINCLUDESDIR)/*/*.h)
+HEADERS += $(wildcard $(KERNELINCLUDESDIR)/*.h)
+HEADERS += $(wildcard $(DRIVERINCLUDESDIR)/*.h)
+HEADERS += $(wildcard $(KERNELINCLUDESDIR)/*/*.h)
+HEADERS += $(wildcard $(DRIVERINCLUDESDIR)/*/*.h)
 
 # The image file that contains all os related code.
 IMAGE = kernel_image
@@ -68,7 +81,7 @@ FASFLAGS = -f elf
 CC     = gcc
 STD    = c11
 CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding \
-	-I$(KERNELINCLUDEDIR) -I$(DRIVERINCLUDEDIR)
+         -I$(KERNELINCLUDESDIR) -I$(DRIVERINCLUDESDIR) -I$(LIBCINCLUDESDIR)
 
 # The linker w'll use. --entry main so it knows where our start point is (main
 # function).
@@ -82,7 +95,7 @@ EMU      = qemu-system-i386
 EMUFLAGS = -drive file=$(IMAGE),index=0,media=disk,format=raw
 
 # The -f options suppresses warnings if a file is not present
-RM=rm -f
+RM = rm -f
 
 
 
@@ -100,6 +113,7 @@ run: $(IMAGE)
 # Sticks our component binaries (boot sector, kernel and extra space) together
 # to create our disk image
 $(IMAGE): $(BOOTBIN) $(LINKFILE) $(DISKSPACE)
+	cat $^ > $@
 
 # Just out extra space padding. Without this, if we tried to read too much
 # we would throw an error
@@ -108,7 +122,8 @@ $(DISKSPACE): $(BOOTDIR)/nullbytes.asm
 
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
-$(LINKFILE): $(KERNELO) $(KERNELOBJFILES) $(DRIVEROBJFILES) $(DRIVERASMOBJFILES)
+$(LINKFILE): $(DRIVEROBJFILES) $(DRIVERASMOBJFILES) $(LIBCOBJFILES)
+$(LINKFILE): $(KERNELO) $(KERNELOBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # Compile C src files into their respective obj file.
@@ -125,6 +140,6 @@ disassemble: $(LINKFILE)
 
 # Remove all but source files
 clean:
-	$(RM) $(DRIVEROBJFILES) $(DRIVERASMOBJFILES) $(KERNELOBJFILES)
-	$(RM) $(DISKSPACE) $(KERNELO) $(IMAGE) $(LINKFILE) $(BOOTBIN) $(KDIS)
-
+	$(RM) $(DRIVEROBJFILES) $(DRIVERASMOBJFILES) $(KERNELOBJFILES) $(KDIS)
+	$(RM) $(LIBCOBJFILES) $(DISKSPACE) $(KERNELO) $(IMAGE) $(LINKFILE)
+	$(RM) $(BOOTBIN)
