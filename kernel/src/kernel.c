@@ -5,7 +5,7 @@ int main(void) {
 
 	*videoMemory = 'X';
 
-	ttyMoveCursor(6);
+	ttySetCursor(0);
 
 	return 0;
 }
