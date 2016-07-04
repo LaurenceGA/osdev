@@ -27,11 +27,14 @@ ASFLAGS = -f bin -I$(BOOTDIR)
 # The image file that contains all os related code.
 IMAGE = os_image
 
+# The kernel file that contains all the linked code.
+LINKFILE = link.o
+
 # C code is compiled using gcc with the C standard of 2011.
 # It's importan that it's in 32 bit mode to be compatible with our os.
 CC     = gcc
 STD    = c11
-CFLAGS = -std=$(STD) -m32 -Wall -Werror -ffreestanding -I$(INCDIR)
+CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding -I$(INCDIR)
 
 # The linker w'll use. --entry main so it knows where our start point is (main
 # function).
@@ -62,7 +65,7 @@ run: $(IMAGE)
 
 # Sticks our component binaries (boot sector, kernel and extra space) together
 # to create our disk image
-$(IMAGE): $(BOOTBIN) kernel_and_link disk_space.bin
+$(IMAGE): $(BOOTBIN) $(LINKFILE) disk_space.bin
 	cat $^ > $@
 
 # Just out extra space padding. Without this, if we tried to read too much
@@ -72,8 +75,7 @@ disk_space.bin: $(BOOTDIR)nullbytes.asm
 
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
-kernel_and_link: $(KERNELO) $(OBJFILES)
-	@echo "Linking the following: $^"
+$(LINKFILE): $(KERNELO) $(OBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # Create the object of our main kernel code
@@ -84,10 +86,11 @@ kernel_and_link: $(KERNELO) $(OBJFILES)
 $(KERNELO): $(KERNEL)
 	$(AS) $< -f elf -o $@
 
-# Remove all but source files
-clean:
-	$(RM) *.o *.bin $(IMAGE) *.dis $(BOOTBIN) $(KERNELO) $(OBJFILES)
-
 # Disassemble our kernel - might be useful for debugging .
 kernel.dis: kernel
 	ndisasm -b 32 $< > $@
+
+# Remove all but source files
+clean:
+	$(RM) *.bin $(IMAGE) *.dis $(BOOTBIN) $(KERNELO) $(OBJFILES) $(LINKFILE)
+

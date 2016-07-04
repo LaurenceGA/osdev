@@ -1,8 +1,12 @@
 #include "string.h"
 
+/**
+ * Calculate the length of a null terminated string. The length is the number of
+ * char's up to the null terminator, not including the null terminator.
+ */
+
 size_t strlen(const char *string) {
-	size_t length = 0;
-	while (string[length])
-		length++;
-	return length;
+	const char *ss;
+	for (ss = string; *ss; ss++);
+	return ss - string;
 }
