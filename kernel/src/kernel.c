@@ -7,5 +7,7 @@ int main() {
 	printf("%s\n", "We've even got printf working!");
 	printf("%cHello\n", "Cd");
 
+	ttySetCursor(0);
+
 	return 0;
 }

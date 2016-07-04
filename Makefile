@@ -97,8 +97,6 @@ EMUFLAGS = -drive file=$(IMAGE),index=0,media=disk,format=raw
 # The -f options suppresses warnings if a file is not present
 RM = rm -f
 
-
-
 # No target specified, so just create the OS image.
 default: $(IMAGE)
 
