@@ -1,8 +1,9 @@
-
 ;
 ; A simple boot sector program that says hello and then goodbye
 ;
+
 [org 0x7c00]
+
 KERNEL_OFFSET equ 0x1000	; Where we will load the kernel
 	mov [BOOT_DRIVE], dl	; The bootloader stores the boot drive
 				; in dl, so we grab that
@@ -37,7 +38,7 @@ load_kernel:
 	call print_string
 
 	mov bx, KERNEL_OFFSET	; Where we will load in the kernel
-	mov dh, 14		; Number of sectors to load
+	mov dh, 15		; Number of sectors to load
 	mov dl, [BOOT_DRIVE]	; Where to look for kernel
 	call disk_load
 
@@ -67,3 +68,4 @@ msg_protected_mode:
 
 times 510-($-$$) db 0	; pad program out to 510th byte
 dw 0xaa55		; Magic number tells the boot loader that this is a boot sector
+

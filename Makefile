@@ -81,7 +81,7 @@ LDFLAGS = -m elf_i386 --oformat binary --entry main -Ttext 0x1000
 EMU      = qemu-system-i386
 EMUFLAGS = -drive file=$(IMAGE),index=0,media=disk,format=raw
 
-# the -f options suppresses warnings if a file is not present
+# The -f options suppresses warnings if a file is not present
 RM=rm -f
 
 
@@ -100,7 +100,6 @@ run: $(IMAGE)
 # Sticks our component binaries (boot sector, kernel and extra space) together
 # to create our disk image
 $(IMAGE): $(BOOTBIN) $(LINKFILE) $(DISKSPACE)
-	cat $^ > $@
 
 # Just out extra space padding. Without this, if we tried to read too much
 # we would throw an error
@@ -128,3 +127,4 @@ disassemble: $(LINKFILE)
 clean:
 	$(RM) $(DRIVEROBJFILES) $(DRIVERASMOBJFILES) $(KERNELOBJFILES)
 	$(RM) $(DISKSPACE) $(KERNELO) $(IMAGE) $(LINKFILE) $(BOOTBIN) $(KDIS)
+
