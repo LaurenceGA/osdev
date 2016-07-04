@@ -1,23 +1,32 @@
 #include "string.h"
 #include "tty.h"
 #include "vga.h"
+#include "io.h"
 
+// The current row and column we're on.
 int terminal_row;
 int terminal_column;
 
+// The current colour of the output.
 uint8_t terminal_colour;
+// An array to hold all of the output characters. It starts at address VIDEO_MEMORY
 uint16_t *terminal_buffer;
 
+// Set the foreground and background of all output starting when this function
+// is called
 static uint8_t makeColour(enum COLOUR fg, enum COLOUR bg) {
 	return fg | bg << 4;
 }
 
+// We want a 16 bit value to put to screen, with the top half being the background
+// and foreground colours, and the bottom 8 bits being the character.
 static uint16_t makeVGAEntry(char c, uint8_t colour) {
 	uint16_t c16 = c;
 	uint16_t colour16 = colour;
 	return c16 | colour16 << 8;
 }
 
+// Initilise the terminal we're going to draw to.
 void initTerminal() {
 	terminal_row    = 0;
 	terminal_column = 0;
@@ -33,15 +42,18 @@ void initTerminal() {
 	}
 }
 
+// Change the colour of the output from here on.
 void terminalSetColour(uint8_t colour) {
 	terminal_colour = colour;
 }
 
+// Move to a specific row and column before drawing the character.
 void terminalMvPutC(char c, uint8_t colour, int col, int row) {
 	const int index = row * VGA_WIDTH + col;
 	terminal_buffer[index] = makeVGAEntry(c, colour);
 }
 
+// Put a charcter to the screen.
 void terminalPutC(char c) {
 	if (c == '\n') {
 		terminal_column = 0;
@@ -60,9 +72,41 @@ down_row:
 	}
 }
 
+// Put a string to the screen.
 void terminalPutS(const char *str) {
 	int len = strlen(str);
 	for (int i = 0; i < len; i++)
 		terminalPutC(str[i]);
+}
+
+// I/O ports
+unsigned short TTY_COMMAND_PORT = 0x3d4;
+unsigned short TTY_DATA_PORT = 0x3d5;
+
+// I/O port commands
+unsigned char TTY_HIGH_BYTE_CMD = 14;
+unsigned char TTY_LOW_BYTE_CMD = 15;
+
+// Set the cursor to the position given by offset number of characters
+void ttySetCursor(unsigned short offset) {
+	// Write the high byte of the offset
+	outb(TTY_COMMAND_PORT, TTY_HIGH_BYTE_CMD);
+	outb(TTY_DATA_PORT, (unsigned char) (offset & 0xff00));
+	// Write the low byte of the offset
+	outb(TTY_COMMAND_PORT, TTY_LOW_BYTE_CMD);
+	outb(TTY_DATA_PORT, (unsigned char) (offset & 0x00ff));
+}
+
+// Gets the current position of the cursor in the terminal
+unsigned short ttyGetCurosr() {
+	unsigned short offset = 0;	// Initialise to 0
+	// Write the high byte of the offset
+	outb(TTY_COMMAND_PORT, TTY_HIGH_BYTE_CMD);
+	offset = inb(TTY_DATA_PORT) << 8;
+	// Write the low byte of the offset
+	offset += inb(TTY_DATA_PORT);
+	outb(TTY_COMMAND_PORT, TTY_LOW_BYTE_CMD);
+
+	return offset;
 }
 

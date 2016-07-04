@@ -12,12 +12,12 @@ DRIVERINCLUDEDIR := $(DRIVERDIR)/includes
 DRIVERSRCDIR     := $(DRIVERDIR)/src
 
 # Boot related code
-BOOTFILE  := $(BOOTDIR)/boot.asm
-ASFILES   := $(wildcard $(BOOTDIR)/*.asm)
-ASFILES   += $(wildcard $(BOOTDIR)/*/*.asm)
-BOOTBIN   := $(BOOTFILE:%.asm=%.bin)
-BINFILES  := $(ASFILES:%.asm=%.bin)
-DISKSPACE := diskspace.bin
+BOOTFILE    := $(BOOTDIR)/boot.asm
+BOOTBIN     := $(BOOTFILE:%.asm=%.bin)
+BOOTASFILES := $(wildcard $(BOOTDIR)/*.asm)
+BOOTASFILES += $(wildcard $(BOOTDIR)/*/*.asm)
+BINFILES    := $(BOOTASFILES:%.asm=%.bin)
+DISKSPACE   := diskspace.bin
 
 # Kernel related code
 KERNEL    := $(KERNELDIR)/kernel_entry.asm
@@ -34,6 +34,12 @@ DRIVERSRCFILES := $(wildcard $(DRIVERDIR)/*.c)
 DRIVERSRCFILES += $(wildcard $(DRIVERSRCDIR)/*.c)
 DRIVERSRCFILES += $(wildcard $(DRIVERSRCDIR)/*/*.c)
 DRIVEROBJFILES := $(DRIVERSRCFILES:%.c=%.o)
+
+# Driver related assembly source files
+DRIVERASMSRCFILES := $(wildcard $(DRIVERDIR)/*.asm)
+DRIVERASMSRCFILES += $(wildcard $(DRIVERSRCDIR)/*.asm)
+DRIVERASMSRCFILES += $(wildcard $(DRIVERSRCDIR)/*/*.asm)
+DRIVERASMOBJFILES := $(DRIVERASMSRCFILES:%.asm=%.o)
 
 # Header files
 HEADERS := $(wildcard $(KERNELINCLUDEDIR)/*.c)
@@ -52,8 +58,10 @@ KDIS = kernel.dis
 
 
 # Assembler of choice. Flags let us assemble to flat binary.
-AS      = nasm
-ASFLAGS = -f bin -I$(BOOTDIR)/
+AS       = nasm
+ASFLAGS  = -f bin -I$(BOOTDIR)/
+# For assembly files that are related to a .h file.
+FASFLAGS = -f elf
 
 # C code is compiled using gcc with the C standard of 2011.
 # It's importan that it's in 32 bit mode to be compatible with our os.
@@ -82,8 +90,8 @@ RM=rm -f
 default: $(IMAGE)
 
 # Compilation of our boot sector
-$(BOOTBIN): $(ASFILES)
-	$(AS) $(ASFLAGS) $(BOOTFILE) -o $@
+$(BOOTBIN): $(BOOTFILE) $(BOOTASFILES)
+	$(AS) $(ASFLAGS) $< -o $@
 
 # Just runs emu with our disk image
 run: $(IMAGE)
@@ -101,16 +109,16 @@ $(DISKSPACE): $(BOOTDIR)/nullbytes.asm
 
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
-$(LINKFILE): $(KERNELO) $(KERNELOBJFILES) $(DRIVEROBJFILES)
+$(LINKFILE): $(KERNELO) $(KERNELOBJFILES) $(DRIVEROBJFILES) $(DRIVERASMOBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
-# Create the object of our main kernel code
+# Compile C src files into their respective obj file.
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Entry file that ensures we just straight into our kernel's main method
-$(KERNELO): $(KERNEL)
-	$(AS) $< -f elf -o $@
+# Assemble asm src files into their respective obj file.
+%.o: %.asm
+	$(AS) $< $(FASFLAGS) -o $@
 
 # Disassemble our kernel - might be useful for debugging .
 disassemble: $(LINKFILE)
