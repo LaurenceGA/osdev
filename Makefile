@@ -1,40 +1,66 @@
 # Important Directories
-BOOTDIR = boot/
-KDIR    = kernel/
-INCDIR := $(KDIR)includes/
-SRCDIR := $(KDIR)src/
+BOOTDIR   = boot
+KERNELDIR = kernel
+DRIVERDIR = drivers
 
-# Boot sector code
-BOOT     := $(BOOTDIR)boot.asm
-ASFILES  := $(wildcard $(BOOTDIR)*.asm)
-ASFILES  += $(wildcard $(BOOTDIR)real/*.asm)
-ASFILES  += $(wildcard $(BOOTDIR)protected/*.asm)
-BOOTBIN  := $(BOOT:%.asm=%.bin)
-BINFILES := $(ASFILES:%.asm=%.bin)
+# Kernel source and include directories
+KERNELINCLUDEDIR := $(KERNELDIR)/includes
+KERNELSRCDIR     := $(KERNELDIR)/src
 
-# Kernel sector code
-KERNEL   := $(KDIR)kernel_entry.asm
-KERNELO  := $(KERNEL:%.asm=%.o)
-SRCFILES := $(wildcard $(KDIR)*.c)
-SRCFILES += $(wildcard $(SRCDIR)*.c)
-SRCFILES += $(wildcard $(SRCDIR)*/*.c)
-OBJFILES := $(SRCFILES:%.c=%.o)
+# Driver source and include directories
+DRIVERINCLUDEDIR := $(DRIVERDIR)/includes
+DRIVERSRCDIR     := $(DRIVERDIR)/src
+
+# Boot related code
+BOOTFILE  := $(BOOTDIR)/boot.asm
+ASFILES   := $(wildcard $(BOOTDIR)/*.asm)
+ASFILES   += $(wildcard $(BOOTDIR)/*/*.asm)
+BOOTBIN   := $(BOOTFILE:%.asm=%.bin)
+BINFILES  := $(ASFILES:%.asm=%.bin)
+DISKSPACE := diskspace.bin
+
+# Kernel related code
+KERNEL    := $(KERNELDIR)/kernel_entry.asm
+KERNELO   := $(KERNEL:%.asm=%.o)
+
+# Kernel related source files
+KERNELSRCFILES := $(wildcard $(KERNELDIR)/*.c)
+KERNELSRCFILES += $(wildcard $(KERNELSRCDIR)/*.c)
+KERNELSRCFILES += $(wildcard $(KERNELSRCDIR)/*/*.c)
+KERNELOBJFILES := $(KERNELSRCFILES:%.c=%.o)
+
+# Driver related source files
+DRIVERSRCFILES := $(wildcard $(DRIVERDIR)/*.c)
+DRIVERSRCFILES += $(wildcard $(DRIVERSRCDIR)/*.c)
+DRIVERSRCFILES += $(wildcard $(DRIVERSRCDIR)/*/*.c)
+DRIVEROBJFILES := $(DRIVERSRCFILES:%.c=%.o)
+
+# Header files
+HEADERS := $(wildcard $(KERNELINCLUDEDIR)/*.c)
+HEADERS += $(wildcard $(DRIVERINCLUDEDIR)/*.c)
+HEADERS += $(wildcard $(KERNELINCLUDEDIR)/*/*.c)
+HEADERS += $(wildcard $(DRIVERINCLUDEDIR)/*/*.c)
+
+# The image file that contains all os related code.
+IMAGE = kernel_image
+
+# The kernel file that contains all the linked code.
+LINKFILE = link.bin
+
+# File to write the disassembled version of the kernel to.
+KDIS = kernel.dis
+
 
 # Assembler of choice. Flags let us assemble to flat binary.
 AS      = nasm
-ASFLAGS = -f bin -I$(BOOTDIR)
-
-# The image file that contains all os related code.
-IMAGE = os_image
-
-# The kernel file that contains all the linked code.
-LINKFILE = link.o
+ASFLAGS = -f bin -I$(BOOTDIR)/
 
 # C code is compiled using gcc with the C standard of 2011.
 # It's importan that it's in 32 bit mode to be compatible with our os.
 CC     = gcc
 STD    = c11
-CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding -I$(INCDIR)
+CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding \
+	-I$(KERNELINCLUDEDIR) -I$(DRIVERINCLUDEDIR)
 
 # The linker w'll use. --entry main so it knows where our start point is (main
 # function).
@@ -57,7 +83,7 @@ default: $(IMAGE)
 
 # Compilation of our boot sector
 $(BOOTBIN): $(ASFILES)
-	$(AS) $(ASFLAGS) $(BOOT) -o $(BOOTBIN)
+	$(AS) $(ASFLAGS) $(BOOTFILE) -o $@
 
 # Just runs emu with our disk image
 run: $(IMAGE)
@@ -65,21 +91,21 @@ run: $(IMAGE)
 
 # Sticks our component binaries (boot sector, kernel and extra space) together
 # to create our disk image
-$(IMAGE): $(BOOTBIN) $(LINKFILE) disk_space.bin
+$(IMAGE): $(BOOTBIN) $(LINKFILE) $(DISKSPACE)
 	cat $^ > $@
 
 # Just out extra space padding. Without this, if we tried to read too much
 # we would throw an error
-disk_space.bin: $(BOOTDIR)nullbytes.asm
+$(DISKSPACE): $(BOOTDIR)/nullbytes.asm
 	$(AS) $(ASFLAGS) $< -o $@
 
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
-$(LINKFILE): $(KERNELO) $(OBJFILES)
+$(LINKFILE): $(KERNELO) $(KERNELOBJFILES) $(DRIVEROBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # Create the object of our main kernel code
-%.o: %.c
+%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Entry file that ensures we just straight into our kernel's main method
@@ -87,10 +113,10 @@ $(KERNELO): $(KERNEL)
 	$(AS) $< -f elf -o $@
 
 # Disassemble our kernel - might be useful for debugging .
-kernel.dis: kernel
-	ndisasm -b 32 $< > $@
+disassemble: $(LINKFILE)
+	ndisasm -b 32 $< > $(KDIS)
 
 # Remove all but source files
 clean:
-	$(RM) *.bin $(IMAGE) *.dis $(BOOTBIN) $(KERNELO) $(OBJFILES) $(LINKFILE)
-
+	$(RM) $(DRIVEROBJFILES) $(DISKSPACE) $(KERNELO) $(IMAGE)
+	$(RM) $(KERNELOBJFILES) $(LINKFILE)  $(BOOTBIN)  $(KDIS)
