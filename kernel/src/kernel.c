@@ -1,9 +1,11 @@
-#include "include/tty.h"
+#include "tty.h"
+#include "stdio.h"
 
-int main(void) {
-	char* videoMemory = (char*) 0xb8000;
-
-	*videoMemory = 'X';
+int main() {
+	initTerminal();
+	printf("Welcome to Kernel World!\n");
+	printf("%s\n", "We've even got printf working!");
+	printf("%cHello\n", "Cd");
 
 	ttySetCursor(0);
 
