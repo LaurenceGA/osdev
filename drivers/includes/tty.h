@@ -16,10 +16,4 @@ void terminalPutC(char);
 // Put a string to the screen.
 void terminalPutS(const char *);
 
-// Moves the tty cursor by number of characters offset
-void ttySetCursor(unsigned short offset);
-// Gets the number of charachters the cursor is current offset by
-unsigned short ttyGetCursor();
-
 #endif // _TTY_H
-
