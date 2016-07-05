@@ -4,10 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static uint16_t *const VIDEO_MEMORY = (uint16_t *) 0xB8000;
-static const size_t VGA_HEIGHT = 25;
-static const size_t VGA_WIDTH  = 80;
-
 enum COLOUR {
 	COLOUR_BLACK		= 0,
 	COLOUR_BLUE		= 1,
