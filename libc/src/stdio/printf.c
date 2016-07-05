@@ -4,6 +4,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "ctype.h"
+#include "stdlib.h"
 
 #include "tty.h"
 
@@ -36,6 +37,7 @@ static int parseSpecifier(const char *sp, struct formatSpecifier *specifier) {
 		*fp++ = *sp++;
 		length++;
 	}
+	*fp = 0; // Null terminate
 	// Parse width
 	for (specifier->width = 0; isdigit(*sp); sp++) {
 		specifier->width = 10 * specifier->width + (*sp - '0');
@@ -88,8 +90,15 @@ int printf(const char *format, ...) {
 			break;
 
 			case 'x': {
-				// int i = (int) va_arg(parameters, int);
-				// amount += printf("%x", i);
+				if (inGroup('#', spec.flags)) {
+					terminalPutS("0x");
+					amount += 2;
+				}
+				int i = (int) va_arg(parameters, int);
+				char buff[32];
+				itoa(i, buff, 16);
+				terminalPutS(buff);
+				amount += strlen(buff);
 			}
 			break;
 
@@ -102,8 +111,11 @@ int printf(const char *format, ...) {
 
 			case 'i':	// fallthrough
 			case 'd': {
-				// int i = (int) va_arg(parameters, int);
-				// amount += printf("%i", i);
+				int i = (int) va_arg(parameters, int);
+				char buff[32];
+				itoa(i, buff, 10);
+				terminalPutS(buff);
+				amount += strlen(buff);
 			}
 			break;
 
