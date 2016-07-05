@@ -2,6 +2,10 @@
 #include "tty.h"
 #include "io.h"
 
+uint16_t *const VIDEO_MEMORY = (uint16_t *) 0xB8000;
+const size_t VGA_HEIGHT = 25;
+const size_t VGA_WIDTH  = 80;
+
 // The current row and column we're on.
 int terminal_row;
 int terminal_column;
@@ -76,8 +80,9 @@ void terminalPutC(char c) {
 	} else if (c == '\r') {
 		terminal_column = 0;
 		return;
-	} else
+	} else {
 		terminalMvPutC(c, terminal_colour, terminal_column, terminal_row);
+	}
 
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
