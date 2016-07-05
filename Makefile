@@ -114,8 +114,8 @@ $(DISKSPACE): $(BOOTDIR)/nullbytes.asm
 
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
-$(LINKFILE): $(DRIVEROBJFILES) $(DRIVERASMOBJFILES) $(LIBCOBJFILES)
-$(LINKFILE): $(KERNELO) $(KERNELOBJFILES)
+$(LINKFILE): $(DRIVEROBJFILES) $(LIBCOBJFILES) $(KERNELOBJFILES)
+$(LINKFILE): $(KERNELO) $(DRIVERASMOBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # Compile C src files into their respective obj file.
