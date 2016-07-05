@@ -1,29 +1,41 @@
 #include "stdlib.h"
+#include "string.h"
 
 
 // Convert a value into its string representation.
 char *itoa(int value, char *buff, int base) {
-	const char digits[] = "0123456789abcdef";
-
-	if (value < 0) {
-		if (base == 10)
-			*buff++ = '-';
-		value *= -1;
+	if (base < 2 || base > 36) {
+		*buff = '\0';
+		return buff;
 	}
 
-	int tmp = value;
+	const char digits[] = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz";
+	char *ctmp = buff;
 
-	do {
-		++buff;
-		tmp /= base;
-	} while (tmp > 0);
+	if (value < 0 && base == 10) {
+		int tmp;
 
-	*buff = '\0';
+		do {
+			tmp = value;
+			value /= base;
+			*ctmp++ = digits[35 + (tmp - value * base)];
+		} while (value);
 
-	do {
-		*--buff = digits[value % base];
-		value /= base;
-	} while (value > 0);
+		*ctmp++ = '-';
+	} else {
+		unsigned int unsigned_equiv = (unsigned int) value;
+		unsigned int utmp;
+
+		do {
+			utmp = unsigned_equiv;
+			unsigned_equiv /= base;
+			*ctmp++ = digits[35 + (utmp - unsigned_equiv * base)];
+		} while (unsigned_equiv);
+	}
+
+	*ctmp = '\0';
+
+	reverse(buff);
 
 	return buff;
 }
