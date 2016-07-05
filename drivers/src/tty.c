@@ -64,8 +64,9 @@ void terminalSetColour(uint8_t colour) {
 
 // Move to a specific row and column before drawing the character.
 void terminalMvPutC(char c, uint8_t colour, int col, int row) {
-	const int index = row * VGA_WIDTH + col;
+	const int index = getCharOffset(col, row);
 	terminal_buffer[index] = makeVGAEntry(c, colour);
+	// ttySetCursor(index+1);
 }
 
 // Put a charcter to the screen.
@@ -88,10 +89,11 @@ down_row:
 }
 
 // Put a string to the screen.
-void terminalPutS(const char *str) {
-	int len = strlen(str);
-	for (int i = 0; i < len; i++)
-		terminalPutC(str[i]);
+int terminalPutS(const char *str) {
+	const char *ss;
+	for (ss = str; *ss != '\0'; ss++)
+		terminalPutC(*ss);
+	return ss-str;
 }
 
 // Set the cursor to the position given by offset number of characters

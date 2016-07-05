@@ -5,7 +5,7 @@ int main() {
 	initTerminal();
 	printf("Welcome to Kernel World!\n");
 	printf("%s\n", "We've even got printf working!");
-	printf("%cHello\n", 'd');
+	printf("Hello %c\n", 'x');
 
 	ttySetCursor(0);
 

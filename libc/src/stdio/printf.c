@@ -3,68 +3,122 @@
 
 #include "string.h"
 #include "stdio.h"
+#include "ctype.h"
 
-static void print(const char *data, int length) {
-	for (int i = 0; i < length; i++)
-		putchar((int) ((const unsigned char *) data)[i]);
+#include "tty.h"
+
+// %[flags][width][.precision][length]specifier
+struct formatSpecifier {
+	char flags[8];
+	int width;
+	int precision;
+	// length
+	char specifier;
+};
+
+// Performs a linear search to see if target belongs to an array of chars
+// group should be null terminated
+static bool inGroup(char target, const char *group) {
+	while (*group) {
+		if (target == *group++)
+			return true;
+	}
+	return false;
+}
+
+// prases a format specifier and it's extra
+static int parseSpecifier(const char *sp, struct formatSpecifier *specifier) {
+	char flags[] = {'0', '#', '+', '-', 0};
+	int length = 0;
+	// Parse flags
+	char *fp = specifier->flags;
+	while (inGroup(*sp, flags)) {
+		*fp++ = *sp++;
+		length++;
+	}
+	// Parse width
+	for (specifier->width = 0; isdigit(*sp); sp++) {
+		specifier->width = 10 * specifier->width + (*sp - '0');
+		length++;
+	}
+	// Parse precision
+	if (*sp == '.') {
+		sp++;
+		length++;
+		for (specifier->precision = 0; isdigit(*sp); sp++) {
+			specifier->precision = 10 * specifier->precision + (*sp - '0');
+			length++;
+		}
+	}
+	// Parse specifier
+	// The next character must be the specifier
+	specifier->specifier = *sp;
+	length++;
+	return length;
 }
 
 /**
  * Print a formatted string to console. Possible formatters:
  *
- * c -- Convert value to a single char.
+ * c -- Print char.
  * x -- Convert integer value to hexadecimal string.
  * s -- Print a null-terminated string
  */
-int printf(const char* restrict format, ...) {
+int printf(const char *format, ...) {
 	va_list parameters;
 	va_start(parameters, format);
-
-	int written = 0;
-	int amount;
-	bool rejected_bad_specifier = false;
+	int amount = 0;
 
 	while (*format != '\0') {
-		if (*format != '%') {
-		print_c:
-			amount = 1;
-			while (format[amount] && format[amount] != '%')
+		if (*format == '%') {
+			format++;
+			struct formatSpecifier spec = {{0}, 0, 0, 0};
+			format += parseSpecifier(format, &spec);
+			switch(spec.specifier) {
+			case '%':
+				putchar('%');
 				amount++;
-			print(format, amount);
-			format += amount;
-			written += amount;
-			continue;
-		}
+			break;
 
-		const char* format_begun_at = format;
+			case 'c': {
+				char c = (char) va_arg(parameters, int);
+				putchar(c);
+				amount++;
+			}
+			break;
 
-		if ( *(++format) == '%' )
-			goto print_c;
+			case 'x': {
+				// int i = (int) va_arg(parameters, int);
+				// amount += printf("%x", i);
+			}
+			break;
 
-		if ( rejected_bad_specifier ) {
-		incomprehensible_conversion:
-			rejected_bad_specifier = true;
-			format = format_begun_at;
-			goto print_c;
-		}
+			case 's': {
+				char *s = va_arg(parameters, char*);
+				terminalPutS(s);
+				// printf("%s", s);	// to avoid the puts' newline
+				amount += strlen(s);
+			}
+			break;
 
-		if (*format == 'c') {
-			format++;
-			char c = (char) va_arg(parameters, int /* char promotes to int */);
-			print(&c, sizeof(c));
-		} else if (*format == 's') {
-			format++;
-			const char* s = va_arg(parameters, const char*);
-			print(s, strlen(s));
-		} else if (*format == 'x') {
-			// TODO: Convert int to string.
+			case 'i':	// fallthrough
+			case 'd': {
+				// int i = (int) va_arg(parameters, int);
+				// amount += printf("%i", i);
+			}
+			break;
+
+			default:
+				putchar('%');
+				putchar(spec.specifier);
+				amount += 2;
+			break;
+			}
 		} else {
-			goto incomprehensible_conversion;
+			putchar(*format++);
+			amount++;
 		}
 	}
-
 	va_end(parameters);
-
-	return written;
+	return amount;
 }
-

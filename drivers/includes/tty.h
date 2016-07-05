@@ -37,7 +37,7 @@ void terminalMvPutC(char, uint8_t, int, int);
 // Put a character to the screen.
 void terminalPutC(char);
 // Put a string to the screen.
-void terminalPutS(const char *);
+int terminalPutS(const char *);
 
 // Moves the tty cursor by number of characters offset
 void ttySetCursor(unsigned short offset);
