@@ -1,6 +1,5 @@
 #include "string.h"
 #include "tty.h"
-#include "vga.h"
 #include "io.h"
 
 // The current row and column we're on.
@@ -42,12 +41,20 @@ void initTerminal() {
 	terminal_colour = makeColour(COLOUR_WHITE, COLOUR_BLACK);
 	terminal_buffer = VIDEO_MEMORY;
 
-	for (int y = 0; y < VGA_HEIGHT; y++) {
-		for (int x = 0; x < VGA_WIDTH; x++) {
-			const int index = y * VGA_WIDTH + x;
+	clearTerminal();
+}
+
+void clearTerminal() {
+	for (unsigned int y = 0; y < VGA_HEIGHT; y++) {
+		for (unsigned int x = 0; x < VGA_WIDTH; x++) {
+			unsigned int index = getCharOffset(x, y);
 			terminal_buffer[index] = makeVGAEntry(' ', terminal_colour);
 		}
 	}
+}
+
+unsigned int getCharOffset(unsigned int x, unsigned int y) {
+	return y * VGA_WIDTH + x;
 }
 
 // Change the colour of the output from here on.

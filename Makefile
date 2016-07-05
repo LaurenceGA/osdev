@@ -69,15 +69,13 @@ LINKFILE = link.bin
 # File to write the disassembled version of the kernel to.
 KDIS = kernel.dis
 
-
-# Assembler of choice. Flags let us assemble to flat binary.
+# Flags let us assemble to flat binary
 AS       = nasm
 ASFLAGS  = -f bin -I$(BOOTDIR)/
-# For assembly files that are related to a .h file.
+# For assembly files that are linked in to create a binary
 FASFLAGS = -f elf
 
-# C code is compiled using gcc with the C standard of 2011.
-# It's importan that it's in 32 bit mode to be compatible with our os.
+# C code is in the 2011 C standard. Must be 32 bit to be compatible
 CC     = gcc
 STD    = c11
 CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding \
@@ -88,9 +86,7 @@ CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding \
 LD      = ld
 LDFLAGS = -m elf_i386 --oformat binary --entry main -Ttext 0x1000
 
-# Qemu is the cpu emulator used. The flags ensure it knows what kind of
-# disk image it's getting. Without them is gives a warning
-# EMU := $(shell command -v qemu-system-i386 >>/dev/null)
+# The flags ensure it knows what kind of disk image it's getting.
 EMU      = qemu-system-i386
 EMUFLAGS = -drive file=$(IMAGE),index=0,media=disk,format=raw
 
@@ -108,13 +104,11 @@ $(BOOTBIN): $(BOOTFILE) $(BOOTASFILES)
 run: $(IMAGE)
 	$(EMU) $(EMUFLAGS)
 
-# Sticks our component binaries (boot sector, kernel and extra space) together
-# to create our disk image
+# Sticks our component binaries together to create our disk image
 $(IMAGE): $(BOOTBIN) $(LINKFILE) $(DISKSPACE)
 	cat $^ > $@
 
-# Just out extra space padding. Without this, if we tried to read too much
-# we would throw an error
+# Just out extra space padding for our disk image to give breathing room
 $(DISKSPACE): $(BOOTDIR)/nullbytes.asm
 	$(AS) $(ASFLAGS) $< -o $@
 
