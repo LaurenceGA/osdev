@@ -59,10 +59,10 @@ static int parseSpecifier(const char *sp, struct formatSpecifier *specifier) {
 
 /**
  * Print a formatted string to console. Possible formatters:
- *
- * c -- Print char.
- * x -- Convert integer value to hexadecimal string.
- * s -- Print a null-terminated string
+ * c 	-- Print character
+ * x 	-- Convert integer value to hexadecimal string
+ * s 	-- Print a null-terminated string
+ * d/i	-- integer
  */
 int printf(const char *format, ...) {
 	va_list parameters;
@@ -96,7 +96,6 @@ int printf(const char *format, ...) {
 			case 's': {
 				char *s = va_arg(parameters, char*);
 				terminalPutS(s);
-				// printf("%s", s);	// to avoid the puts' newline
 				amount += strlen(s);
 			}
 			break;

@@ -16,12 +16,12 @@ uint8_t terminal_colour;
 uint16_t *terminal_buffer;
 
 // I/O ports
-unsigned short TTY_COMMAND_PORT = 0x3d4;
-unsigned short TTY_DATA_PORT = 0x3d5;
+const unsigned short TTY_COMMAND_PORT = 0x3d4;
+const unsigned short TTY_DATA_PORT = 0x3d5;
 
 // I/O port commands
-unsigned char TTY_HIGH_BYTE_CMD = 14;
-unsigned char TTY_LOW_BYTE_CMD = 15;
+const unsigned char TTY_HIGH_BYTE_CMD = 14;
+const unsigned char TTY_LOW_BYTE_CMD = 15;
 
 // Set the foreground and background of all output starting when this function
 // is called
@@ -70,7 +70,6 @@ void terminalSetColour(uint8_t colour) {
 void terminalMvPutC(char c, uint8_t colour, int col, int row) {
 	const int index = getCharOffset(col, row);
 	terminal_buffer[index] = makeVGAEntry(c, colour);
-	// ttySetCursor(index+1);
 }
 
 // Put a charcter to the screen.
@@ -91,6 +90,7 @@ down_row:
 		if (++terminal_row == VGA_HEIGHT)
 			terminal_row = 0;
 	}
+	ttySetCursor(getCharOffset(terminal_column, terminal_row));
 }
 
 // Put a string to the screen.
@@ -105,10 +105,10 @@ int terminalPutS(const char *str) {
 void ttySetCursor(unsigned short offset) {
 	// Write the high byte of the offset
 	outb(TTY_COMMAND_PORT, TTY_HIGH_BYTE_CMD);
-	outb(TTY_DATA_PORT, (unsigned char) (offset & 0xff00));
+	outb(TTY_DATA_PORT, (unsigned char) ((offset >> 8) & 0xff));
 	// Write the low byte of the offset
 	outb(TTY_COMMAND_PORT, TTY_LOW_BYTE_CMD);
-	outb(TTY_DATA_PORT, (unsigned char) (offset & 0x00ff));
+	outb(TTY_DATA_PORT, (unsigned char) offset & 0x00ff);
 }
 
 // Gets the current position of the cursor in the terminal
