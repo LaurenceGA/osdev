@@ -12,4 +12,7 @@ void reverse(char *);
 
 size_t strlen(const char *);
 
+char *strchr(const char *, int);
+char *strrchr(const char *, int);
+
 #endif // _STRING_H
