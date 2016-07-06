@@ -21,4 +21,7 @@ char *strncpy(char *s, const char *t, int n);
 int strcmp(const char *s, const char *t);
 int strncmp(const char *s, const char *t, int n);
 
+char *strchr(const char *, int);
+char *strrchr(const char *, int);
+
 #endif // _STRING_H
