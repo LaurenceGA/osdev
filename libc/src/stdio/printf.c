@@ -97,15 +97,13 @@ int printf(const char *format, ...) {
 				int i = (int) va_arg(parameters, int);
 				char buff[32];
 				itoa(i, buff, 16);
-				terminalPutS(buff);
-				amount += strlen(buff);
+				amount += terminalPutS(buff);
 			}
 			break;
 
 			case 's': {
 				char *s = va_arg(parameters, char*);
-				terminalPutS(s);
-				amount += strlen(s);
+				amount += terminalPutS(s);
 			}
 			break;
 
@@ -114,8 +112,7 @@ int printf(const char *format, ...) {
 				int i = (int) va_arg(parameters, int);
 				char buff[32];
 				itoa(i, buff, 10);
-				terminalPutS(buff);
-				amount += strlen(buff);
+				amount += terminalPutS(buff);
 			}
 			break;
 
