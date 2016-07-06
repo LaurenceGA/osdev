@@ -52,7 +52,9 @@ int atoi(char *str, int base) {
 				return 0;
 			val = val * base + tmp;
 		} else {
-			if ((tmp -= 0x27) >= base)
+			if (islower(str[index]))
+				tmp -= 0x20;
+			if ((tmp -= 0x7) >= base)
 				return 0;
 			val = val * base + tmp;
 		}
