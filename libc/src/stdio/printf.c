@@ -59,6 +59,12 @@ static int parseSpecifier(const char *sp, struct formatSpecifier *specifier) {
 	return length;
 }
 
+// Insert num chars (c) into a string from start
+static void insertChars(char *start, char c, int num) {
+	memmove(start + num, start, strlen(start)+1);
+	memset(start, c, num);
+}
+
 /**
  * Print a formatted string to console. Possible formatters:
  * c 	-- Print character
@@ -74,54 +80,91 @@ int printf(const char *format, ...) {
 	while (*format != '\0') {
 		if (*format == '%') {
 			format++;
+
+			char buffer[2048] = {0};
+			// char *buffer = (char *) malloc(sizeof(char) * 1024);
+
 			struct formatSpecifier spec = {{0}, 0, 0, 0};
 			format += parseSpecifier(format, &spec);
+
 			switch(spec.specifier) {
 			case '%':
-				putchar('%');
-				amount++;
+				buffer[0] = '%';
+				buffer[1] = '\0';
 			break;
 
 			case 'c': {
 				char c = (char) va_arg(parameters, int);
-				putchar(c);
-				amount++;
+				buffer[0] = c;
+				buffer[1] = '\0';
 			}
 			break;
 
 			case 'x': {
+				char *buff = buffer;
 				if (inGroup('#', spec.flags)) {
-					terminalPutS("0x");
-					amount += 2;
+					strcpy(buff, "0x");
+					buff += 2;
 				}
 				int i = (int) va_arg(parameters, int);
-				char buff[32];
 				itoa(i, buff, 16);
-				amount += terminalPutS(buff);
+				// If left justified, no '0' padding
+				if (!inGroup('-', spec.flags) && inGroup('0', spec.flags)) {
+					int pad = spec.width - strlen(buffer);
+					if (pad >= 0) {
+						insertChars(buff, '0', pad);
+					}
+				}
 			}
 			break;
 
 			case 's': {
 				char *s = va_arg(parameters, char*);
-				amount += terminalPutS(s);
+				strcpy(buffer, s);
 			}
 			break;
 
 			case 'i':	// fallthrough
 			case 'd': {
+				char *buff = buffer;
 				int i = (int) va_arg(parameters, int);
-				char buff[32];
+				if (inGroup('+', spec.flags) && i >= 0) {
+					*buff = '+';
+					buff++;
+					*buff = '\0';
+				}
 				itoa(i, buff, 10);
-				amount += terminalPutS(buff);
+				if (i < 0)
+					buff++;
+				// If left justified, no '0' padding
+				if (!inGroup('-', spec.flags) && inGroup('0', spec.flags)) {
+					int pad = spec.width - strlen(buffer);
+					if (pad >= 0) {
+						insertChars(buff, '0', pad);
+					}
+				}
 			}
 			break;
 
 			default:
-				putchar('%');
-				putchar(spec.specifier);
-				amount += 2;
+				buffer[0] = '%';
+				buffer[1] = spec.specifier;
+				buffer[2] = '\0';
 			break;
 			}
+
+			// We have our buffer string mostly done
+			int len = strlen(buffer);
+			int pad = spec.width - len;
+			if (pad >= 0) {
+				if (inGroup('-', spec.flags)) {
+					memset(buffer+len, ' ', pad);
+					buffer[len+pad] = '\0';
+				} else
+					insertChars(buffer, ' ', pad);
+			}
+			amount += terminalPutS(buffer);
+			// free(buffer);
 		} else {
 			putchar(*format++);
 			amount++;
