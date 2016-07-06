@@ -45,4 +45,9 @@ void clearTerminal();
 // Turns terminal coordinates into a character offset
 unsigned int getCharOffset(unsigned int x, unsigned int y);
 
+// Check if the terminal needs to be scrolled.
+void checkScroll();
+// Shuffle each terminal row down one, and blank the last row.
+void doScroll();
+
 #endif // _TTY_H

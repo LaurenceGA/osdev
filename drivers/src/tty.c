@@ -61,6 +61,36 @@ unsigned int getCharOffset(unsigned int x, unsigned int y) {
 	return y * VGA_WIDTH + x;
 }
 
+// Shuffle each terminal row down one, and blank the last row.
+void doScroll() {
+	// Move each row down (up, on the screen) one.
+	for (unsigned int y = 1; y < VGA_HEIGHT; y ++) {
+		memcpy(terminal_buffer + getCharOffset(0, y - 1),
+			terminal_buffer + getCharOffset(0, y), VGA_WIDTH * 2);
+	}
+
+	// Empty the last row.
+	for (unsigned int x = 0; x < VGA_WIDTH * 2; x++) {
+		unsigned int index = getCharOffset(x, VGA_HEIGHT - 1);
+		terminal_buffer[index] = makeVGAEntry(0, terminal_colour);
+	}
+}
+
+// Check if the terminal needs to be scrolled.
+void checkScroll() {
+	// Increment the current column because we just printed a character.
+	if (++terminal_column == VGA_WIDTH) {
+		terminal_column = 0;
+		++terminal_row;
+	}
+
+	if (terminal_row == VGA_HEIGHT) {
+		doScroll();
+		// Go back to the last row.
+		--terminal_row;
+	}
+}
+
 // Change the colour of the output from here on.
 void terminalSetColour(uint8_t colour) {
 	terminal_colour = colour;
@@ -74,22 +104,22 @@ void terminalMvPutC(char c, uint8_t colour, int col, int row) {
 
 // Put a charcter to the screen.
 void terminalPutC(char c) {
-	if (c == '\n') {
-		terminal_column = 0;
-		goto down_row;
-	} else if (c == '\r') {
-		terminal_column = 0;
-		return;
-	} else {
-		terminalMvPutC(c, terminal_colour, terminal_column, terminal_row);
+	switch (c) {
+		case '\n':
+			++terminal_row;
+			checkScroll();
+			// FALLTRHOUGH
+		case '\r':
+			terminal_column = 0;
+			break;
+		default:
+			terminalMvPutC(c, terminal_colour, terminal_column,
+					terminal_row);
+			checkScroll();
+			break;
 	}
 
-	if (++terminal_column == VGA_WIDTH) {
-		terminal_column = 0;
-down_row:
-		if (++terminal_row == VGA_HEIGHT)
-			terminal_row = 0;
-	}
+	// Move the cursor with the output.
 	ttySetCursor(getCharOffset(terminal_column, terminal_row));
 }
 

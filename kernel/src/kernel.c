@@ -16,6 +16,9 @@ int main() {
 	printf("%d\n", 5);
 	printf("%d\n", -12);
 	printf("%d\n", 243);
+	printf("%d\n", 0x100);
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	printf("Just checking to see where this ends up and if it continues on to the next line or not.\n");
 
 	return 0;
 }
