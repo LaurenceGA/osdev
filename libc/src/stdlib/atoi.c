@@ -22,18 +22,16 @@ int atoi(char *str, int base) {
 		switch(str[index + 1]) {
 		case 'b':
 		case 'B':
-			if (base == 2) {
+			if (base == 2)
 				index += 2;
-			} else {
+			else
 				return 0;
-			}
 			break;
 		case 'x':
-			if (base == 16) {
+			if (base == 16)
 				index += 2;
-			} else {
+			else
 				return 0;
-			}
 			break;
 		default:
 			break;
@@ -47,17 +45,13 @@ int atoi(char *str, int base) {
 
 	for (tmp = 0; isalnum(str[index]); index++) {
 		tmp = str[index] - '0';
-		if (isdigit(str[index])) {
+		if (base <= 10) {
 			if (tmp >= base)
 				return 0;
-			val = val * base + tmp;
-		} else {
-			if (islower(str[index]))
-				tmp -= 0x20;
-			if ((tmp -= 0x7) >= base)
-				return 0;
-			val = val * base + tmp;
+		} else if ((tmp -= islower(str[index]) ? 0x27 : 0x7) >= base) {
+			return 0;
 		}
+		val = val * base + tmp;
 	}
 
 	if (base == 10)

@@ -13,6 +13,9 @@ int main() {
 	printf("%0+5d\n", -12);
 	printf("%d\n", atoi("a", 36));
 	printf("%d\n", atoi("A", 36));
+	printf("%d\n", atoi("A", 10));
+	printf("%d\n", atoi("10", 10));
+	printf("%d\n", atoi("100", 2));
 
 	return 0;
 }
