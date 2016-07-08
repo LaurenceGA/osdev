@@ -62,7 +62,7 @@ ASFLAGS = -f elf
 # C code is in the 2011 C standard. Must be 32 bit to be compatible
 CC     = gcc
 STD    = c11
-CFLAGS = -std=$(STD) -m32 -Wall -Werror -ffreestanding \
+CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding \
          -I$(KERNELINCLUDESDIR) -I$(DRIVERINCLUDESDIR) -I$(LIBCINCLUDESDIR)
 
 # The linker w'll use. --entry main so it knows where our start point is (main

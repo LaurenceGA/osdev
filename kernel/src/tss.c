@@ -1,14 +1,12 @@
 #include "tss.h"
 
-static tss_t tss;
+static struct tss _tss;
 
-uint32_t tss_init()
-{
-    return (uint32_t) &tss;
+uint32_t tss_init() {
+	return (uint32_t) &_tss;
 }
 
-void tss_set_kernel_stack(uint16_t segsel, uint32_t vaddr)
-{
-    tss.esp0 = vaddr;
-    tss.ss0 = segsel;
+void tss_set_kernel_stack(uint16_t segsel, uint32_t vaddr) {
+	_tss.esp0 = vaddr;
+	_tss.ss0 = segsel;
 }
