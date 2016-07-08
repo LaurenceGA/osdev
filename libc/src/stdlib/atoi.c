@@ -5,7 +5,7 @@
 // If unsuccessful, return 0.
 int atoi(char *str, int base) {
 	// Only support bases between 2 and 16 for now.
-	if (base < 2 && base > 36)
+	if (base > 36 || base < 2)
 		return 0;
 
 	int index, val = 0, tmp, sign = 1;
