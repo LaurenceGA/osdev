@@ -16,11 +16,6 @@ KERNEL_OFFSET equ 0x1000	; Where we will load the kernel
 
 	call load_kernel
 
-	; mov bx, 0x9000		; 5 secotrs 0x0000(ES):0x9000(BX)
-	; mov dh, 5
-	; mov dl, [BOOT_DRIVE]
-	; call disk_load
-
 	call switch_to_pm
 
 	jmp $	; Infinite loop
@@ -68,4 +63,3 @@ msg_protected_mode:
 
 times 510-($-$$) db 0	; pad program out to 510th byte
 dw 0xaa55		; Magic number tells the boot loader that this is a boot sector
-

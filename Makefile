@@ -34,6 +34,12 @@ KERNELSRCFILES += $(wildcard $(KERNELSRCDIR)/*.c)
 KERNELSRCFILES += $(wildcard $(KERNELSRCDIR)/*/*.c)
 KERNELOBJFILES := $(KERNELSRCFILES:%.c=%.o)
 
+# Kernel related assembly source files
+KERNELASMSRCFILES := $(wildcard $(KERNELDIR)/*.asm)
+KERNELASMSRCFILES += $(wildcard $(KERNELSRCDIR)/*.asm)
+KERNELASMSRCFILES += $(wildcard $(KERNELSRCDIR)/*/*.asm)
+KERNELASMOBJFILES := $(KERNELASMSRCFILES:%.asm=%.o)
+
 # Driver related source files
 DRIVERSRCFILES := $(wildcard $(DRIVERDIR)/*.c)
 DRIVERSRCFILES += $(wildcard $(DRIVERSRCDIR)/*.c)
@@ -115,7 +121,7 @@ $(DISKSPACE): $(BOOTDIR)/nullbytes.asm
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
 $(LINKFILE): $(DRIVEROBJFILES) $(LIBCOBJFILES) $(KERNELOBJFILES)
-$(LINKFILE): $(KERNELO) $(DRIVERASMOBJFILES)
+$(LINKFILE): $(KERNELO) $(DRIVERASMOBJFILES) $(KERNELASMOBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # Compile C src files into their respective obj file.
