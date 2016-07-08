@@ -21,7 +21,7 @@
 
 #define PIC_EOI     0x20
 
-void pic_init()
+void initPIC()
 {
 	// ICW1
 	outb(PIC1_PORT_A, PIC1_ICW1);
