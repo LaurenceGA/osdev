@@ -20,9 +20,6 @@ LIBCSRCDIR        := $(LIBCDIR)/src
 # The iso file
 ISOFILE = kernel.iso
 
-# The image file that contains all os related code.
-IMAGE = kernel_image
-
 # The kernel file that contains all the linked code.
 LINKFILE   = kernel.elf
 LINKSCRIPT = link.ld
@@ -31,46 +28,32 @@ LINKSCRIPT = link.ld
 KDIS = kernel.dis
 
 # The kernel loader
-LOADER  := $(BOOTDIR)/loader.asm
-LOADERO := $(LOADER:%.asm=%.o)
+LOADER := $(BOOTDIR)/loader.asm
 
 # Kernel related source files
-KERNELSRCFILES := $(wildcard $(KERNELDIR)/*.c)
-KERNELSRCFILES += $(wildcard $(KERNELSRCDIR)/*.c)
-KERNELSRCFILES += $(wildcard $(KERNELSRCDIR)/*/*.c)
-KERNELOBJFILES := $(KERNELSRCFILES:%.c=%.o)
-
-# Kernel related assembly source files
-KERNELASMSRCFILES := $(wildcard $(KERNELDIR)/*.asm)
-KERNELASMSRCFILES += $(wildcard $(KERNELSRCDIR)/*.asm)
-KERNELASMSRCFILES += $(wildcard $(KERNELSRCDIR)/*/*.asm)
-KERNELASMOBJFILES := $(KERNELASMSRCFILES:%.asm=%.o)
+SRCFILES := $(wildcard $(KERNELDIR)/*.c $(KERNELSRCDIR)/*.c $(KERNELSRCDIR)/*/*.c)
 
 # Driver related source files
-DRIVERSRCFILES := $(wildcard $(DRIVERDIR)/*.c)
-DRIVERSRCFILES += $(wildcard $(DRIVERSRCDIR)/*.c)
-DRIVERSRCFILES += $(wildcard $(DRIVERSRCDIR)/*/*.c)
-DRIVEROBJFILES := $(DRIVERSRCFILES:%.c=%.o)
-
-# Driver related assembly source files
-DRIVERASMSRCFILES := $(wildcard $(DRIVERDIR)/*.asm)
-DRIVERASMSRCFILES += $(wildcard $(DRIVERSRCDIR)/*.asm)
-DRIVERASMSRCFILES += $(wildcard $(DRIVERSRCDIR)/*/*.asm)
-DRIVERASMOBJFILES := $(DRIVERASMSRCFILES:%.asm=%.o)
+SRCFILES += $(wildcard $(DRIVERDIR)/*.c $(DRIVERSRCDIR)/*.c $(DRIVERSRCDIR)/*/*.c)
 
 # Libc related sourced files
-LIBCSRCFILES := $(wildcard $(LIBCDIR)/*.c)
-LIBCSRCFILES += $(wildcard $(LIBCSRCDIR)/*.c)
-LIBCSRCFILES += $(wildcard $(LIBCSRCDIR)/*/*.c)
-LIBCOBJFILES := $(LIBCSRCFILES:%.c=%.o)
+SRCFILES += $(wildcard $(LIBCDIR)/*.c $(LIBCSRCDIR)/*.c $(LIBCSRCDIR)/*/*.c)
+
+# Kernel related assembly source files
+ASMSRCFILES := $(wildcard $(KERNELDIR)/*.asm $(KERNELSRCDIR)/*.asm $(KERNELSRCDIR)/*/*.asm)
+
+# Driver related assembly source files
+ASMSRCFILES += $(wildcard $(DRIVERDIR)/*.asm $(DRIVERSRCDIR)/*.asm $(DRIVERSRCDIR)/*/*.asm)
+
+# All object files
+OBJFILES := $(LOADER:%.asm=%.o)
+OBJFILES += $(ASMSRCFILES:%.asm=%.o)
+OBJFILES += $(SRCFILES:%.c=%.o)
 
 # Header files
-HEADERS := $(wildcard $(LIBCINCLUDESDIR)/*.h)
-HEADERS += $(wildcard $(LIBCINCLUDESDIR)/*/*.h)
-HEADERS += $(wildcard $(KERNELINCLUDESDIR)/*.h)
-HEADERS += $(wildcard $(DRIVERINCLUDESDIR)/*.h)
-HEADERS += $(wildcard $(KERNELINCLUDESDIR)/*/*.h)
-HEADERS += $(wildcard $(DRIVERINCLUDESDIR)/*/*.h)
+HEADERS := $(wildcard $(LIBCINCLUDESDIR)/*.h   $(LIBCINCLUDESDIR)/*/*.h)
+HEADERS += $(wildcard $(KERNELINCLUDESDIR)/*.h $(KERNELINCLUDESDIR)/*/*.h)
+HEADERS += $(wildcard $(DRIVERINCLUDESDIR)/*.h $(DRIVERINCLUDESDIR)/*/*.h)
 
 # Flags let us assemble to flat binary
 AS       = nasm
@@ -79,7 +62,7 @@ ASFLAGS = -f elf
 # C code is in the 2011 C standard. Must be 32 bit to be compatible
 CC     = gcc
 STD    = c11
-CFLAGS = -std=$(STD) -m32 -Wall -Werror -Wpedantic -ffreestanding \
+CFLAGS = -std=$(STD) -m32 -Wall -Werror -ffreestanding \
          -I$(KERNELINCLUDESDIR) -I$(DRIVERINCLUDESDIR) -I$(LIBCINCLUDESDIR)
 
 # The linker w'll use. --entry main so it knows where our start point is (main
@@ -95,6 +78,7 @@ EMUFLAGS = -cdrom $(ISOFILE)
 RM = rm -f
 
 
+
 default: iso
 
 # Just runs emu with our disk image
@@ -103,8 +87,7 @@ run: iso
 
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
-$(LINKFILE): $(DRIVEROBJFILES) $(LIBCOBJFILES) $(KERNELOBJFILES)
-$(LINKFILE): $(LOADERO) $(DRIVERASMOBJFILES) $(KERNELASMOBJFILES)
+$(LINKFILE): $(OBJFILES)
 	ld $(LDFLAGS) $^ -o $@ -T $(LINKSCRIPT)
 
 # Compile C src files into their respective obj file.
@@ -120,7 +103,7 @@ disassemble: $(LINKFILE)
 	ndisasm -b 32 $< > $(KDIS)
 
 iso: $(LINKFILE)
-	cp $< iso/boot/$<
+	cp $< $(ISODIR)/boot/$<
 	genisoimage -R                              \
                 -b boot/grub/stage2_eltorito    \
                 -no-emul-boot                   \
@@ -134,7 +117,5 @@ iso: $(LINKFILE)
 
 # Remove all but source files
 clean:
-	$(RM) $(DRIVEROBJFILES) $(DRIVERASMOBJFILES) $(KERNELOBJFILES) $(ISOFILE)
-	$(RM) $(LIBCOBJFILES) $(LINKFILE) $(LOADERO) $(KDIS) $(LINKFILE)
-	$(RM) $(KERNELASMOBJFILES)
+	$(RM) $(ISOFILE) $(LINKFILE) $(KDIS) $(OBJFILES)
 
