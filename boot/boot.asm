@@ -3,7 +3,8 @@
 ;
 
 [org 0x7c00]
-
+global _start
+_start:
 KERNEL_OFFSET equ 0x1000	; Where we will load the kernel
 	mov [BOOT_DRIVE], dl	; The bootloader stores the boot drive
 				; in dl, so we grab that
@@ -61,5 +62,3 @@ msg_loading_kernel:
 msg_protected_mode:
 	db 'In 32-bit protected mode', 0
 
-times 510-($-$$) db 0	; pad program out to 510th byte
-dw 0xaa55		; Magic number tells the boot loader that this is a boot sector

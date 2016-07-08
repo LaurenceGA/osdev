@@ -1,5 +1,6 @@
 #include "pic.h"
 #include "io.h"
+#include "stdio.h"
 
 #define PIC1_PORT_A 0x20
 #define PIC1_PORT_B 0x21
@@ -26,18 +27,22 @@ void pic_init()
 	// ICW1
 	outb(PIC1_PORT_A, PIC1_ICW1);
 	outb(PIC2_PORT_A, PIC2_ICW1);
+	printf("AT ICW1\n");
 
 	// ICW2
 	outb(PIC1_PORT_B, PIC1_ICW2);
 	outb(PIC2_PORT_B, PIC2_ICW2);
+	printf("AT ICW2\n");
 
 	// ICW3
 	outb(PIC1_PORT_B, PIC1_ICW3);
 	outb(PIC2_PORT_B, PIC2_ICW3);
+	printf("AT ICW3\n");
 
 	// ICW4
 	outb(PIC1_PORT_B, PIC1_ICW4);
 	outb(PIC2_PORT_B, PIC2_ICW4);
+	printf("AT ICW4\n");
 
 	pic_mask(0xEC, 0xFF);
 }
