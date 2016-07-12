@@ -33,7 +33,7 @@ load_kernel:
 	call print_string
 
 	mov bx, KERNEL_OFFSET	; Where we will load in the kernel
-	mov dh, 15		; Number of sectors to load
+	mov dh, 25		; Number of sectors to load
 	mov dl, [BOOT_DRIVE]	; Where to look for kernel
 	call disk_load
 

@@ -5,6 +5,6 @@
 #define NUM_IDT_ENTRIES 256
 
 // Takes care of all the interrupt descriptor table (IDT) initialization
-void init_idt();
+void initIDT();
 
 #endif // IDT_H
