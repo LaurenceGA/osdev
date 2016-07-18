@@ -88,7 +88,7 @@ run: iso
 # It's very important that the dependencies are in this order so they are stuck
 # together properly (entry before kernel)
 $(LINKFILE): $(OBJFILES)
-	ld $(LDFLAGS) $^ -o $@ -T $(LINKSCRIPT)
+	$(LD) $(LDFLAGS) $^ -o $@ -T $(LINKSCRIPT)
 
 # Compile C src files into their respective obj file.
 %.o: %.c $(HEADERS)
