@@ -19,6 +19,8 @@ struct stack_state {
 	unsigned int eflags;
 } __attribute__((packed));
 
+typedef void (*interrupt_handler_func)(struct cpu_state cpu, unsigned int interrupt, struct stack_state stack);
 void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stack_state stack);
+void registerInterruptHandler(unsigned int interrupt, interrupt_handler_func func);
 
 #endif // INTERRUPTS_H

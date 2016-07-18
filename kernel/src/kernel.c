@@ -7,6 +7,7 @@
 #include "gdt.h"
 #include "idt.h"
 #include "pic.h"
+#include "keyboard.h"
 
 int main() {
 	initTerminal();
@@ -16,8 +17,9 @@ int main() {
 	uint32_t tss_vadr = tss_init();
 	gdt_init(tss_vadr);
 
-	pic_init();	// Re-map PIC
-	init_idt();	// Load IDT
+	initPIC();	// Re-map PIC
+	initKBD();
+	initIDT();	// Load IDT
 
 	printf("And we've reached the end.");
 

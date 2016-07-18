@@ -70,7 +70,7 @@ void enable_interrupts();
 static void createIDTGate(unsigned char n, unsigned int handler,
 			unsigned char type, unsigned char pl);
 
-void init_idt() {
+void initIDT() {
 	struct idt_ptr idtp;
 	idtp.limit = NUM_IDT_ENTRIES * sizeof(struct idt_gate) - 1;
 	idtp.base = (unsigned int) &idt;

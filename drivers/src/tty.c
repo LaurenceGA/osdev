@@ -112,6 +112,15 @@ void terminalPutC(char c) {
 		case '\r':
 			terminal_column = 0;
 			break;
+		case '\b':
+		{
+			unsigned short cursorPos = ttyGetCursor();
+			if (cursorPos)
+				--cursorPos;
+			terminal_column = cursorPos % VGA_WIDTH;
+			terminal_row = cursorPos / VGA_WIDTH;
+			break;
+		}
 		default:
 			terminalMvPutC(c, terminal_colour, terminal_column,
 					terminal_row);
@@ -142,14 +151,14 @@ void ttySetCursor(unsigned short offset) {
 }
 
 // Gets the current position of the cursor in the terminal
-unsigned short ttyGetCurosr() {
+unsigned short ttyGetCursor() {
 	unsigned short offset = 0;	// Initialise to 0
 	// Write the high byte of the offset
 	outb(TTY_COMMAND_PORT, TTY_HIGH_BYTE_CMD);
 	offset = inb(TTY_DATA_PORT) << 8;
 	// Write the low byte of the offset
-	offset += inb(TTY_DATA_PORT);
 	outb(TTY_COMMAND_PORT, TTY_LOW_BYTE_CMD);
+	offset += inb(TTY_DATA_PORT);
 
 	return offset;
 }
