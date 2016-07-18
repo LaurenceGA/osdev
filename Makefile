@@ -1,7 +1,7 @@
 # Important Directories
-BOOTDIR   = boot
-KERNELDIR = kernel
 DRIVERDIR = drivers
+KERNELDIR = kernel
+BOOTDIR   = boot
 LIBCDIR   = libc
 ISODIR    = iso
 
@@ -21,7 +21,7 @@ LIBCSRCDIR        := $(LIBCDIR)/src
 ISOFILE = kernel.iso
 
 # The kernel file that contains all the linked code.
-LINKFILE   = kernel.elf
+LINKFILE  := $(ISODIR)/boot/kernel.elf
 LINKSCRIPT = link.ld
 
 # File to write the disassembled version of the kernel to.
@@ -77,6 +77,20 @@ EMUFLAGS = -cdrom $(ISOFILE)
 # The -f options suppresses warnings if a file is not present
 RM = rm -f
 
+# I can't find a version of genisoimage that I can use on MacOS, so this is here
+# to allow me to change what actually generates the iso image, without effecting
+# anyone else running the program.
+ISOGEN   = genisoimage
+ISOFLAGS = -R -quiet -boot-info-table -no-emul-boot -boot-load-size 4 \
+		   -input-charset utf8
+
+# Our bootloader
+GRUBDIR = boot/grub
+GRUB   := $(GRUBDIR)/stage2_eltorito
+
+# The name of the kernel.
+KNAME = kernel
+
 
 
 default: iso
@@ -103,19 +117,8 @@ disassemble: $(LINKFILE)
 	ndisasm -b 32 $< > $(KDIS)
 
 iso: $(LINKFILE)
-	cp $< $(ISODIR)/boot/$<
-	genisoimage -R                              \
-                -b boot/grub/stage2_eltorito    \
-                -no-emul-boot                   \
-                -boot-load-size 4               \
-                -A os                           \
-                -input-charset utf8             \
-                -quiet                          \
-                -boot-info-table                \
-                -o $(ISOFILE)                   \
-                $(ISODIR)
+	$(ISOGEN) $(ISOFLAGS) -b $(GRUB) -A $(KNAME) -o $(ISOFILE) $(ISODIR)
 
 # Remove all but source files
 clean:
 	$(RM) $(ISOFILE) $(LINKFILE) $(KDIS) $(OBJFILES)
-
