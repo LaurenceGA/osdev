@@ -17,15 +17,18 @@ DRIVERSRCDIR      := $(DRIVERDIR)/src
 LIBCINCLUDESDIR   := $(LIBCDIR)/includes
 LIBCSRCDIR        := $(LIBCDIR)/src
 
+# The name of the kernel.
+KNAME = kernel
+
 # The iso file
-ISOFILE = kernel.iso
+ISOFILE = $(KNAME).iso
 
 # The kernel file that contains all the linked code.
-LINKFILE  := $(ISODIR)/boot/kernel.elf
+LINKFILE  := $(ISODIR)/boot/$(KNAME).elf
 LINKSCRIPT = link.ld
 
 # File to write the disassembled version of the kernel to.
-KDIS = kernel.dis
+KDIS = $(KNAME).dis
 
 # The kernel loader
 LOADER := $(BOOTDIR)/loader.asm
@@ -85,11 +88,11 @@ ISOFLAGS = -R -quiet -boot-info-table -no-emul-boot -boot-load-size 4 \
 		   -input-charset utf8
 
 # Our bootloader
-GRUBDIR = boot/grub
-GRUB   := $(GRUBDIR)/stage2_eltorito
-
-# The name of the kernel.
-KNAME = kernel
+GRUBDIR       = boot/grub
+GRUB         := $(GRUBDIR)/stage2_eltorito
+GRUBMENU     := $(ISODIR)/$(GRUBDIR)/menu.lst
+GRUBTIMEOUT   = 2
+GRUBDEFAULTS := default=0\ntimeout=$(GRUBTIMEOUT)
 
 
 
@@ -117,6 +120,7 @@ disassemble: $(LINKFILE)
 	ndisasm -b 32 $< > $(KDIS)
 
 iso: $(LINKFILE)
+	echo "$(GRUBDEFAULTS)\n\ntitle $(KNAME)\nkernel /boot/$(KNAME).elf" > $(GRUBMENU)
 	$(ISOGEN) $(ISOFLAGS) -b $(GRUB) -A $(KNAME) -o $(ISOFILE) $(ISODIR)
 
 # Remove all but source files

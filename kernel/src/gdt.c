@@ -28,35 +28,35 @@ struct gdt_ptr {
 struct gdt_entry gdt_entries[GDT_NUM_ENTRIES];
 
 /* external assembly function to set the gdt */
-void gdt_load_and_set(uint32_t);
-static void gdt_create_entry(uint32_t n, uint8_t pl, uint8_t type);
-static void gdt_create_tss_entry(uint32_t n, uint32_t tss_vaddr);
+void GDTLoadSet(uint32_t);
+static void GDTCreateEntry(uint32_t n, uint8_t pl, uint8_t type);
+static void GDTCreateTSSEntry(uint32_t n, uint32_t tss_vaddr);
 
-void gdt_init(uint32_t tss_vaddr) {
+void initGDT(uint32_t tss_vaddr) {
 	struct gdt_ptr gdt_ptr;
 	gdt_ptr.limit = sizeof(struct gdt_entry) * GDT_NUM_ENTRIES;
 	gdt_ptr.base  = (uint32_t) &gdt_entries;
 
 	/* the null entry */
-	gdt_create_entry(0, 0, 0);
+	GDTCreateEntry(0, 0, 0);
 	/* kernel mode code segment */
-	gdt_create_entry(1, PL0, CODE_RX_TYPE);
+	GDTCreateEntry(1, PL0, CODE_RX_TYPE);
 	/* kernel mode data segment */
-	gdt_create_entry(2, PL0, DATA_RW_TYPE);
+	GDTCreateEntry(2, PL0, DATA_RW_TYPE);
 	/* user mode code segment */
-	gdt_create_entry(3, PL3, CODE_RX_TYPE);
+	GDTCreateEntry(3, PL3, CODE_RX_TYPE);
 	/* user mode data segment */
-	gdt_create_entry(4, PL3, DATA_RW_TYPE);
+	GDTCreateEntry(4, PL3, DATA_RW_TYPE);
 
-	gdt_create_tss_entry(5, tss_vaddr);
+	GDTCreateTSSEntry(5, tss_vaddr);
 
-	gdt_load_and_set((uint32_t) &gdt_ptr);
+	GDTLoadSet((uint32_t) &gdt_ptr);
 
 	tss_load_and_set(TSS_SEGSEL);
 }
 
 
-static void gdt_create_entry(uint32_t n, uint8_t pl, uint8_t type) {
+static void GDTCreateEntry(uint32_t n, uint8_t pl, uint8_t type) {
 	gdt_entries[n].base_low  = (SEGMENT_BASE & 0xFFFF);
 	gdt_entries[n].base_mid  = (SEGMENT_BASE >> 16) & 0xFF;
 	gdt_entries[n].base_high = (SEGMENT_BASE >> 24) & 0xFF;
@@ -86,7 +86,7 @@ static void gdt_create_entry(uint32_t n, uint8_t pl, uint8_t type) {
 		(0x01 << 7) | ((pl & 0x03) << 5) | (0x01 << 4) | (type & 0x0F);
 }
 
-static void gdt_create_tss_entry(uint32_t n, uint32_t tss_vaddr) {
+static void GDTCreateTSSEntry(uint32_t n, uint32_t tss_vaddr) {
 	gdt_entries[n].base_low  = (tss_vaddr & 0xFFFF);
 	gdt_entries[n].base_mid  = (tss_vaddr >> 16) & 0xFF;
 	gdt_entries[n].base_high = (tss_vaddr >> 24) & 0xFF;

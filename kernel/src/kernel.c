@@ -14,8 +14,8 @@ int main() {
 	printf("Welcome to Kernel World!\n");
 	printf("We've even got printf working!\n");
 
-	uint32_t tss_vadr = tss_init();
-	gdt_init(tss_vadr);
+	uint32_t tss_vadr = initTSS();
+	initGDT(tss_vadr);
 
 	initPIC();	// Re-map PIC
 	initKBD();

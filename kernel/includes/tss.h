@@ -48,10 +48,10 @@ struct tss {
 	uint16_t io_map_base;
 } __attribute__((packed));
 
-uint32_t tss_init();
+uint32_t initTSS();
 
 void tss_load_and_set(uint16_t tss_segsel); /* defined in tss_asm.s */
 
-void tss_set_kernel_stack(uint16_t segsel, uint32_t vaddr);
+void TSSSetKernelStack(uint16_t segsel, uint32_t vaddr);
 
 #endif /* TSS_H */
