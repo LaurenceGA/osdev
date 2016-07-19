@@ -7,17 +7,17 @@ global interruptHandler_%1
 interruptHandler_%1:
 	push dword 0	; 0 for the error code
 	push dword %1	; interrupt number
-	jmp common_interrupt_handler
+	jmp commonInterruptHandler
 %endmacro
 
 %macro error_code_handler 1
 global interruptHandler_%1
 interruptHandler_%1:
 	push dword %1	; interrupt number
-	jmp common_interrupt_handler
+	jmp commonInterruptHandler
 %endmacro
 
-common_interrupt_handler:
+commonInterruptHandler:
 	push esp
 	add dword [esp], 8
 	; save registers

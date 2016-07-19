@@ -14,9 +14,9 @@ GDTLoadSet:
 	lgdt [eax]		; load gdt table
 
 	; load cs segment by doing a far jump
-	jmp SEGSEL_KERNEL_CS:.reload_segments
+	jmp SEGSEL_KERNEL_CS:.reloadSegments
 
-.reload_segments:
+.reloadSegments:
 	; we only use one segment for data
 	mov ax, SEGSEL_KERNEL_DS
 	mov ds, ax

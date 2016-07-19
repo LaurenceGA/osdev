@@ -91,7 +91,7 @@ ISOFLAGS = -R -quiet -boot-info-table -no-emul-boot -boot-load-size 4 \
 GRUBDIR       = boot/grub
 GRUB         := $(GRUBDIR)/stage2_eltorito
 GRUBMENU     := $(ISODIR)/$(GRUBDIR)/menu.lst
-GRUBTIMEOUT   = 2
+GRUBTIMEOUT   = 1
 GRUBDEFAULTS := default=0\ntimeout=$(GRUBTIMEOUT)
 
 
@@ -115,7 +115,7 @@ $(LINKFILE): $(OBJFILES)
 %.o: %.asm
 	$(AS) $< $(ASFLAGS) -o $@
 
-# Disassemble our kernel - might be useful for debugging .
+# Disassemble our kernel - might be useful for debugging.
 disassemble: $(LINKFILE)
 	ndisasm -b 32 $< > $(KDIS)
 
@@ -128,6 +128,6 @@ loc:
 	@wc -l $(HEADERS) $(SRCFILES) $(ASMSRCFILES) $(LINKSCRIPT) $(GRUBMENU) \
 		$(LOADER) | sort
 
-# Remove all but source files
+# Remove all files that may have been built.
 clean:
 	$(RM) $(ISOFILE) $(LINKFILE) $(KDIS) $(OBJFILES)

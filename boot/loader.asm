@@ -1,7 +1,7 @@
 
 MAGIC_NUMBER		equ 0x1BADB002
-FLAGS			equ 0x0
-CHECKSUM		equ -MAGIC_NUMBER
+FLAGS				equ 0x0
+CHECKSUM			equ -MAGIC_NUMBER
 KERNEL_STACK_SIZE	equ 4096
 
 section .text
@@ -22,9 +22,7 @@ loader:
 	extern main
 	call main
 
+; In case main returns, enter an infinite loop.
 .loop:
 	hlt
 	jmp .loop
-
-
-

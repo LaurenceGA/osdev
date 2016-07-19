@@ -1,11 +1,10 @@
 #include <stdarg.h>
-#include "stdbool.h"
 
+#include "stdbool.h"
 #include "string.h"
 #include "stdio.h"
 #include "ctype.h"
 #include "stdlib.h"
-
 #include "tty.h"
 
 // %[flags][width][.precision][length]specifier
@@ -72,7 +71,7 @@ static void insertChars(char *start, char c, int num) {
  * s 	-- Print a null-terminated string
  * d/i	-- integer
  */
-int printf(const char *format, ...) {
+int printf(const char *restrict format, ...) {
 	va_list parameters;
 	va_start(parameters, format);
 	int amount = 0;
