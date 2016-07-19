@@ -97,6 +97,44 @@ void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 	(void) stack;
 }
 
+unsigned int createKeyEvent(unsigned short scanCode) {
+	/*
+	Key event packet
+	32 bits
+	bit	| description
+	----------------------
+	31-23	| ASCII
+	22-14	| Key code
+	3	| Caps lock on
+	2	| 1 = ctrl down
+	1	| 1 = shift down
+	0	| 0 = press, 1 = release
+	*/
+	unsigned int keyEvent = 0;
+	enum KEY_CODE keycode;
+	if (scanCode & 0x80) {
+		// Set key event flag for released
+		keyEvent |= 0x1;
+		// Remove break bit flag
+		keycode = scanToKeycode[scanCode & 0xff7f];
+		// Set keycode bits 22-14
+		keyEvent |= keycode << 16;
+		keys[keycode].isPressed = false;
+		if (keycode == KEY_CAPS) {
+			capsLock = !capsLock;
+		}
+	} else {
+		keycode = scanToKeycode[scanCode];
+		keys[keycode].isPressed = true;
+	}
+	keyEvent |= getASCII(keycode) << 22;
+	keyEvent |= capsLock << 3;
+	keyEvent |= (keys[KEY_LCTRL].isPressed || keys[KEY_RCTRL].isPressed) << 2;
+	keyEvent |= (keys[KEY_LSHIFT].isPressed || keys[KEY_RSHIFT].isPressed) << 1;
+
+	return keyEvent;
+}
+
 bool isDown(enum KEY_CODE code) {
 	return keys[code].isPressed;
 }
