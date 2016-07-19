@@ -1,5 +1,6 @@
 #include "pic.h"
 #include "io.h"
+#include "stdio.h"
 
 #define PIC1_PORT_A 0x20
 #define PIC1_PORT_B 0x21

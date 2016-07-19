@@ -5,7 +5,7 @@
 // If unsuccessful, return 0.
 int atoi(char *str, int base) {
 	// Only support bases between 2 and 16 for now.
-	if (base < 2 && base > 16)
+	if (base > 36 || base < 2)
 		return 0;
 
 	int index, val = 0, tmp, sign = 1;
@@ -22,18 +22,16 @@ int atoi(char *str, int base) {
 		switch(str[index + 1]) {
 		case 'b':
 		case 'B':
-			if (base == 2) {
+			if (base == 2)
 				index += 2;
-			} else {
+			else
 				return 0;
-			}
 			break;
 		case 'x':
-			if (base == 16) {
+			if (base == 16)
 				index += 2;
-			} else {
+			else
 				return 0;
-			}
 			break;
 		default:
 			break;
@@ -45,17 +43,15 @@ int atoi(char *str, int base) {
 			return 0;
 	}
 
-	for (tmp = 0; isxdigit(str[index]); index++) {
+	for (tmp = 0; isalnum(str[index]); index++) {
 		tmp = str[index] - '0';
-		if (isdigit(str[index])) {
+		if (base <= 10) {
 			if (tmp >= base)
 				return 0;
-			val = val * base + tmp;
-		} else {
-			if ((tmp = tmp - 0x27) >= base)
-				return 0;
-			val = val * base + tmp;
+		} else if ((tmp -= islower(str[index]) ? 0x27 : 0x7) >= base) {
+			return 0;
 		}
+		val = val * base + tmp;
 	}
 
 	if (base == 10)
