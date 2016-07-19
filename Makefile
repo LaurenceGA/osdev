@@ -59,7 +59,7 @@ HEADERS += $(wildcard $(KERNELINCLUDESDIR)/*.h $(KERNELINCLUDESDIR)/*/*.h)
 HEADERS += $(wildcard $(DRIVERINCLUDESDIR)/*.h $(DRIVERINCLUDESDIR)/*/*.h)
 
 # Flags let us assemble to flat binary
-AS       = nasm
+AS      = nasm
 ASFLAGS = -f elf
 
 # C code is in the 2011 C standard. Must be 32 bit to be compatible

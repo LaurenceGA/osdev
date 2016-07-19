@@ -2,7 +2,7 @@
 #define _TTY_H
 
 #include <stddef.h>
-#include <stdint.h>
+#include "stdint.h"
 
 enum COLOUR {
 	COLOUR_BLACK		= 0,
