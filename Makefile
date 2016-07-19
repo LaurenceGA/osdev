@@ -124,7 +124,7 @@ iso: $(LINKFILE)
 	$(ISOGEN) $(ISOFLAGS) -b $(GRUB) -A $(KNAME) -o $(ISOFILE) $(ISODIR)
 
 loc:
-	@echo "Sorting files in ascending order of number of lines of code ..."
+	@echo -e "Sorting files in ascending order of number of lines of code ..."
 	@wc -l $(HEADERS) $(SRCFILES) $(ASMSRCFILES) $(LINKSCRIPT) $(GRUBMENU) \
 		$(LOADER) | sort
 
