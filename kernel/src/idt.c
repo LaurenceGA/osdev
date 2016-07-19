@@ -62,8 +62,8 @@ DECLARE_INTERRUPT_HANDLER(47);
 
 
 // External assembly functions
-void load_idt(unsigned int address);
-void enable_interrupts();
+void loadIDT(unsigned int address);
+void enableInterrupts();
 
 static void createIDTGate(unsigned char n, unsigned int handler,
 			unsigned char type, unsigned char pl);
@@ -113,9 +113,9 @@ void initIDT() {
 	CREATE_IDT_GATE(46);
 	CREATE_IDT_GATE(47);
 
-	load_idt((unsigned int) &idtp);
+	loadIDT((unsigned int) &idtp);
 
-	enable_interrupts();
+	enableInterrupts();
 }
 
 static void createIDTGate(unsigned char n, unsigned int handler,

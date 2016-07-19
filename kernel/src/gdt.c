@@ -52,7 +52,7 @@ void initGDT(uint32_t tss_vaddr) {
 
 	GDTLoadSet((uint32_t) &gdt_ptr);
 
-	tss_load_and_set(TSS_SEGSEL);
+	TSSLoadSet(TSS_SEGSEL);
 }
 
 

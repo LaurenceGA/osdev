@@ -1,10 +1,8 @@
 #include "keyboard.h"
-#include "interrupts.h"
 #include "stdio.h"
 #include "io.h"
 #include "pic.h"
 #include "stdlib.h"
-#include <stdbool.h>
 
 #define KBD_DATA_PORT 0x60
 #define KBD_CMD_PORT 0x64

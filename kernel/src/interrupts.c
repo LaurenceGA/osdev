@@ -13,5 +13,5 @@ void interruptHandler(struct cpu_state cpu, unsigned int interrupt,
 	if (handlers[interrupt] != 0) {
 		handlers[interrupt](cpu, interrupt, stack);
 	}
-	pic_acknowledge();
+	picAcknowledge();
 }

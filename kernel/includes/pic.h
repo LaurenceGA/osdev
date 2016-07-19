@@ -12,7 +12,7 @@
 #define COM2_INT_IDX    PIC1_START + 3
 
 void initPIC();
-void pic_acknowledge();
-void pic_mask(unsigned char mask1, unsigned char mask2);
+void picAcknowledge();
+void picMask(unsigned char mask1, unsigned char mask2);
 
 #endif // PIC_H

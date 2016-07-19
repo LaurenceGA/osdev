@@ -1,6 +1,6 @@
 extern interruptHandler
 
-global enable_interrupts
+global enableInterrupts
 
 %macro no_error_code_handler 1
 global interruptHandler_%1
@@ -44,7 +44,7 @@ common_interrupt_handler:
 	pop esp
 	iret
 
-enable_interrupts:
+enableInterrupts:
 	sti
 	ret
 

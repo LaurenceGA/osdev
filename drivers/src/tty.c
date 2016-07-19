@@ -3,8 +3,8 @@
 #include "io.h"
 
 uint16_t *const VIDEO_MEMORY = (uint16_t *) 0xB8000;
-const size_t VGA_HEIGHT = 25;
-const size_t VGA_WIDTH  = 80;
+const int VGA_HEIGHT = 25;
+const int VGA_WIDTH  = 80;
 
 // The current row and column we're on.
 int terminal_row;

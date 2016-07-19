@@ -40,16 +40,16 @@ void initPIC()
 	outb(PIC1_PORT_B, PIC1_ICW4);
 	outb(PIC2_PORT_B, PIC2_ICW4);
 
-	pic_mask(0xEC, 0xFF);
+	picMask(0xEC, 0xFF);
 }
 
-void pic_acknowledge()
+void picAcknowledge()
 {
 	outb(PIC1_PORT_A, PIC_EOI);
 	outb(PIC2_PORT_A, PIC_EOI);
 }
 
-void pic_mask(unsigned char mask1, unsigned char mask2)
+void picMask(unsigned char mask1, unsigned char mask2)
 {
 	outb(PIC1_PORT_B, mask1);
 	outb(PIC2_PORT_B, mask2);
