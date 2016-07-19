@@ -1,18 +1,18 @@
-extern interrupt_handler
+extern interruptHandler
 
 global enable_interrupts
 
 %macro no_error_code_handler 1
-global interrupt_handler_%1
-interrupt_handler_%1:
+global interruptHandler_%1
+interruptHandler_%1:
 	push dword 0	; 0 for the error code
 	push dword %1	; interrupt number
 	jmp common_interrupt_handler
 %endmacro
 
 %macro error_code_handler 1
-global interrupt_handler_%1
-interrupt_handler_%1:
+global interruptHandler_%1
+interruptHandler_%1:
 	push dword %1	; interrupt number
 	jmp common_interrupt_handler
 %endmacro
@@ -29,7 +29,7 @@ common_interrupt_handler:
 	push esi
 	push edi
 
-	call interrupt_handler	; Call C function
+	call interruptHandler	; Call C function
 
 	; Restore registers
 	pop edi

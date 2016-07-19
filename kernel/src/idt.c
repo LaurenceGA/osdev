@@ -16,11 +16,9 @@ struct idt_ptr {
 struct idt_gate idt[NUM_IDT_ENTRIES];
 
 #define CREATE_IDT_GATE(idx) \
-	createIDTGate(idx, (unsigned int) &interrupt_handler_##idx,\
-			1, 0);
-			// IDT_TRAP_GATE_TYPE, PL0);
+	createIDTGate(idx, (unsigned int) &interruptHandler_##idx, 1, 0);
 
-#define DECLARE_INTERRUPT_HANDLER(i) void interrupt_handler_##i(void)
+#define DECLARE_INTERRUPT_HANDLER(i) void interruptHandler_##i(void)
 
 // Protected mode exceptions
 DECLARE_INTERRUPT_HANDLER(0);

@@ -123,6 +123,11 @@ iso: $(LINKFILE)
 	echo "$(GRUBDEFAULTS)\n\ntitle $(KNAME)\nkernel /boot/$(KNAME).elf" > $(GRUBMENU)
 	$(ISOGEN) $(ISOFLAGS) -b $(GRUB) -A $(KNAME) -o $(ISOFILE) $(ISODIR)
 
+loc:
+	@echo "Sorting files in ascending order of number of lines of code ..."
+	@wc -l $(HEADERS) $(SRCFILES) $(ASMSRCFILES) $(LINKSCRIPT) $(GRUBMENU) \
+		$(LOADER) | sort
+
 # Remove all but source files
 clean:
 	$(RM) $(ISOFILE) $(LINKFILE) $(KDIS) $(OBJFILES)
