@@ -30,4 +30,12 @@
 
 # Debug files
 *.dSYM/
+
+# Disassembled files
+*.dis
+
+# ISO files
 *.iso
+
+# Grub files
+*.lst
