@@ -2,7 +2,7 @@
 
 static struct tss _tss;
 
-uint32_t initTSS() {
+uint32_t initTSS(void) {
 	return (uint32_t) &_tss;
 }
 

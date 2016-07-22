@@ -63,12 +63,12 @@ DECLARE_INTERRUPT_HANDLER(47);
 
 // External assembly functions
 void loadIDT(unsigned int address);
-void enableInterrupts();
+void enableInterrupts(void);
 
 static void createIDTGate(unsigned char n, unsigned int handler,
 			unsigned char type, unsigned char pl);
 
-void initIDT() {
+void initIDT(void) {
 	struct idt_ptr idtp;
 	idtp.limit = NUM_IDT_ENTRIES * sizeof(struct idt_gate) - 1;
 	idtp.base = (unsigned int) &idt;

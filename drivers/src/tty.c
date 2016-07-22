@@ -2,7 +2,9 @@
 #include "tty.h"
 #include "io.h"
 
-uint16_t *const VIDEO_MEMORY = (uint16_t *) 0xB8000;
+#include "constants.h"
+
+uint16_t *const VIDEO_MEMORY = (uint16_t *) (KERNEL_START_VADDR + 0xB8000);
 const int VGA_HEIGHT = 25;
 const int VGA_WIDTH  = 80;
 
@@ -38,7 +40,7 @@ static uint16_t makeVGAEntry(char c, uint8_t colour) {
 }
 
 // Initilise the terminal we're going to draw to.
-void initTerminal() {
+void initTerminal(void) {
 	terminal_row    = 0;
 	terminal_column = 0;
 
@@ -48,7 +50,7 @@ void initTerminal() {
 	clearTerminal();
 }
 
-void clearTerminal() {
+void clearTerminal(void) {
 	for (unsigned int y = 0; y < VGA_HEIGHT; y++) {
 		for (unsigned int x = 0; x < VGA_WIDTH; x++) {
 			unsigned int index = getCharOffset(x, y);
@@ -62,7 +64,7 @@ unsigned int getCharOffset(unsigned int x, unsigned int y) {
 }
 
 // Shuffle each terminal row down one, and blank the last row.
-void doScroll() {
+void doScroll(void) {
 	// Move each row down (up, on the screen) one.
 	for (unsigned int y = 1; y < VGA_HEIGHT; y ++) {
 		memcpy(terminal_buffer + getCharOffset(0, y - 1),
@@ -77,7 +79,7 @@ void doScroll() {
 }
 
 // Check if the terminal needs to be scrolled.
-void checkScroll() {
+void checkScroll(void) {
 	// Increment the current column because we just printed a character.
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
@@ -151,7 +153,7 @@ void ttySetCursor(unsigned short offset) {
 }
 
 // Gets the current position of the cursor in the terminal
-unsigned short ttyGetCursor() {
+unsigned short ttyGetCursor(void) {
 	unsigned short offset = 0;	// Initialise to 0
 	// Write the high byte of the offset
 	outb(TTY_COMMAND_PORT, TTY_HIGH_BYTE_CMD);

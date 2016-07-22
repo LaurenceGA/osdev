@@ -34,7 +34,7 @@ static void registerKey(enum KEY_CODE keyCode, unsigned short scanCode,
 }
 
 // Returns true if finished scan code aquisition
-static bool readScanCode() {
+static bool readScanCode(void) {
 	*SCBufferHead++ = inb(KBD_DATA_PORT);
 	return !(inb(KBD_CMD_PORT) & 1);
 }
@@ -99,7 +99,7 @@ bool isDown(enum KEY_CODE code) {
 	return keys[code].isPressed;
 }
 
-void initKBD() {
+void initKBD(void) {
 	registerInterruptHandler(KBD_INT_IDX, KBDinterrupt);
 
 	// R0

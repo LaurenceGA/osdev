@@ -48,7 +48,7 @@ struct tss {
 	uint16_t io_map_base;
 } __attribute__((packed));
 
-uint32_t initTSS();
+uint32_t initTSS(void);
 
 void TSSLoadSet(uint16_t tss_segsel); /* defined in tss_asm.s */
 

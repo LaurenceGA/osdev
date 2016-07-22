@@ -23,7 +23,7 @@ enum COLOUR {
 };
 
 // Set some initial values of the screen.
-void initTerminal();
+void initTerminal(void);
 
 // Set the output colour of characters and their background.
 void terminalSetColour(uint8_t);
@@ -37,16 +37,16 @@ int terminalPutS(const char *);
 // Moves the tty cursor by number of characters offset
 void ttySetCursor(unsigned short offset);
 // Gets the number of charachters the cursor is current offset by
-unsigned short ttyGetCursor();
+unsigned short ttyGetCursor(void);
 
 // Clears the terminal
-void clearTerminal();
+void clearTerminal(void);
 // Turns terminal coordinates into a character offset
 unsigned int getCharOffset(unsigned int x, unsigned int y);
 
 // Check if the terminal needs to be scrolled.
-void checkScroll();
+void checkScroll(void);
 // Shuffle each terminal row down one, and blank the last row.
-void doScroll();
+void doScroll(void);
 
 #endif // _TTY_H

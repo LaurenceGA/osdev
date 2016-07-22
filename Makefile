@@ -113,18 +113,18 @@ $(LINKFILE): $(OBJFILES)
 
 # Assemble asm src files into their respective obj file.
 %.o: %.asm
-	$(AS) $< $(ASFLAGS) -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 # Disassemble our kernel - might be useful for debugging.
 disassemble: $(LINKFILE)
 	ndisasm -b 32 $< > $(KDIS)
 
 iso: $(LINKFILE)
-	echo "$(GRUBDEFAULTS)\n\ntitle $(KNAME)\nkernel /boot/$(KNAME).elf" > $(GRUBMENU)
+	echo -e "$(GRUBDEFAULTS)\n\ntitle $(KNAME)\nkernel /boot/$(KNAME).elf" > $(GRUBMENU)
 	$(ISOGEN) $(ISOFLAGS) -b $(GRUB) -A $(KNAME) -o $(ISOFILE) $(ISODIR)
 
 loc:
-	@echo -e "Sorting files in ascending order of number of lines of code ..."
+	@echo "Sorting files in ascending order of number of lines of code ..."
 	@wc -l $(HEADERS) $(SRCFILES) $(ASMSRCFILES) $(LINKSCRIPT) $(GRUBMENU) \
 		$(LOADER) | sort
 
