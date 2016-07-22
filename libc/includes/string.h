@@ -24,4 +24,6 @@ int strncmp(const char *s, const char *t, int n);
 char *strchr(const char *, int);
 char *strrchr(const char *, int);
 
+char *strstr(const char *, const char *);
+
 #endif // _STRING_H
