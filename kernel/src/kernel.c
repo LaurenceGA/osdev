@@ -8,8 +8,9 @@
 #include "pic.h"
 #include "keyboard.h"
 #include "multiboot.h"
+#include "constants.h"
 
-int main(multiboot_info_t* mbd, unsigned int magic) {
+int main(multiboot_info_t *mbt, unsigned int magic) {
 	initTerminal();
 	printf("Welcome to Kernel World!\n");
 	printf("We've even got printf working!\n");
@@ -21,7 +22,13 @@ int main(multiboot_info_t* mbd, unsigned int magic) {
 	initKBD();
 	initIDT();	// Load IDT
 
-	printf("And we've reached the end.");
+	printf("And we've reached the end.\n");
+
+	// mbt->mem_upper and mbt->mem_lower are in KiB (1024 bits).
+	printf("We have %d MiB of usable Memory!\n",
+		(mbt->mem_upper - mbt->mem_lower) >> 10);
+
+	printf("%s\n", strstr("Hello", "ell"));
 
 	return 0;
 }

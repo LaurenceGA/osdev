@@ -1,10 +1,9 @@
 #include "string.h"
 #include "tty.h"
 #include "io.h"
-
 #include "constants.h"
 
-uint16_t *const VIDEO_MEMORY = (uint16_t *) (KERNEL_START_VADDR + 0xB8000);
+uint16_t *const VIDEO_MEMORY = (uint16_t *) PHYSICAL_TO_VIRT_ADDR(0xB8000);
 const int VGA_HEIGHT = 25;
 const int VGA_WIDTH  = 80;
 

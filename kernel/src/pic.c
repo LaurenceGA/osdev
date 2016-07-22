@@ -22,8 +22,7 @@
 
 #define PIC_EOI     0x20
 
-void initPIC(void)
-{
+void initPIC(void) {
 	// ICW1
 	outb(PIC1_PORT_A, PIC1_ICW1);
 	outb(PIC2_PORT_A, PIC2_ICW1);
@@ -43,14 +42,12 @@ void initPIC(void)
 	picMask(0xEC, 0xFF);
 }
 
-void picAcknowledge(void)
-{
+void picAcknowledge(void) {
 	outb(PIC1_PORT_A, PIC_EOI);
 	outb(PIC2_PORT_A, PIC_EOI);
 }
 
-void picMask(unsigned char mask1, unsigned char mask2)
-{
+void picMask(unsigned char mask1, unsigned char mask2) {
 	outb(PIC1_PORT_B, mask1);
 	outb(PIC2_PORT_B, mask2);
 }

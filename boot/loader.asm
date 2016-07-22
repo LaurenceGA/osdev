@@ -2,8 +2,7 @@ global _loader		; Make the loader SubRoutine visible to the linker
 extern main		; We define the entry to the kernel in a c file
 
 MODULEALIGN	equ 1<<0	; Align loaded modules to page boundaries
-MEMINFO		equ 1<<1	; We want GRUB to give us information
-					; regarding memory.
+MEMINFO		equ 1<<1	; We want GRUB to give us information regarding memory.
 ; We pass GRUB the above flags to tell it what we want.
 FLAGS		equ MODULEALIGN | MEMINFO
 
@@ -92,6 +91,7 @@ STARTKERNEL:
 
 	; Now, we pass the Multiboot info into the main function that begins the
 	; kernel. This is a physical address, and may not be in the first 4MB.
+	add ebx, KVIRTUALBASE		; Map the multiboot info to the correct address.
 	push ebx
 
 	call main
