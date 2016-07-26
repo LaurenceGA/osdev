@@ -23,4 +23,6 @@ typedef void (*interruptHandlerFunc)(struct cpu_state cpu, unsigned int interrup
 void interruptHandler(struct cpu_state cpu, unsigned int interrupt, struct stack_state stack);
 void registerInterruptHandler(unsigned int interrupt, interruptHandlerFunc func);
 
+void disableInterrupts(void);
+
 #endif // INTERRUPTS_H

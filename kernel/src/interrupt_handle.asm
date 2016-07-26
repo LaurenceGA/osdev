@@ -1,6 +1,7 @@
 extern interruptHandler
 
 global enableInterrupts
+global disableInterrupts
 
 %macro no_error_code_handler 1
 global interruptHandler_%1
@@ -47,6 +48,11 @@ commonInterruptHandler:
 enableInterrupts:
 	sti
 	ret
+
+disableInterrupts:
+	cli
+	ret
+
 
 ; protected mode exceptions
 no_error_code_handler 0

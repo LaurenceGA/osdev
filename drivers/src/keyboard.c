@@ -47,15 +47,14 @@ static char getASCII(enum KEY_CODE code) {
 	if (isDown(KEY_LSHIFT) || isDown(KEY_RSHIFT)) {
 		ch = keys[code].altASCII;
 		if (capsLock) {
-			if (ch >= 'A' && ch <= 'Z') {
-				ch = keys[code].ASCII;;
-			}
+			if (ch >= 'A' && ch <= 'Z')
+				ch = keys[code].ASCII;
 		}
 	} else {
 		ch = keys[code].ASCII;
 		if (capsLock) {
 			if (ch >= 'a' && ch <= 'z') {
-				ch = keys[code].altASCII;;
+				ch = keys[code].altASCII;
 			}
 		}
 	}
@@ -115,9 +114,9 @@ unsigned int createKeyEvent(unsigned short scanCode) {
 		keyEvent |= (keys[keycode].isPressed ? 1 : 0) << 4;
 		keys[keycode].isPressed = true;
 	}
-	if (keycode == 0) {
+	if (keycode == 0)
 		printf("%#x\n", scanCode);
-	}
+
 	keyEvent |= getASCII(keycode) << 24;
 	keyEvent |= (capsLock ? 1 : 0) << 3;
 	keyEvent |= (keys[KEY_LCTRL].isPressed || keys[KEY_RCTRL].isPressed) << 2;
@@ -163,7 +162,6 @@ void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 	(void) cpu;
 	(void) stack;
 }
-
 
 bool isDown(enum KEY_CODE code) {
 	return keys[code].isPressed;
