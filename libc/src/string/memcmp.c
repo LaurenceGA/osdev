@@ -13,4 +13,3 @@ int memcmp(const void *aptr, const void *bptr, size_t size) {
 
 	return 0;
 }
-

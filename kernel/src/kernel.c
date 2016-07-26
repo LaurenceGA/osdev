@@ -10,7 +10,7 @@
 #include "multiboot.h"
 #include "constants.h"
 
-int main(multiboot_info_t *mbt, unsigned int magic) {
+int kmain(multiboot_info_t *mbt, unsigned int magic) {
 	initTerminal();
 	printf("Welcome to Kernel World!\n");
 	printf("We've even got printf working!\n");
@@ -24,11 +24,9 @@ int main(multiboot_info_t *mbt, unsigned int magic) {
 
 	printf("And we've reached the end.\n");
 
-	// mbt->mem_upper and mbt->mem_lower are in KiB (1024 bits).
+	// mbt->mem_upper and mbt->mem_lower are in KiB (1024 bytes).
 	printf("We have %d MiB of usable Memory!\n",
-		(mbt->mem_upper - mbt->mem_lower) >> 10);
-
-	printf("%s\n", strstr("Hello", "ell"));
+		(mbt->mem_upper + mbt->mem_lower) >> 10);
 
 	return 0;
 }

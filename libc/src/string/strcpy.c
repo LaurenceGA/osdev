@@ -1,19 +1,23 @@
 #include "string.h"
 
-// Copies t into s
-char *strcpy(char *s, const char *t) {
-	char *ss = s;
-	while ((*s++ = *t++))
-		;
+// Copies s2 into s1.
+char *strcpy(char *restrict s1, const char *restrict s2) {
+	char *ss = s1;
+
+	while ((*s1++ = *s2++))
+	/* Do Nothing */;
+
 	return ss;
 }
 
-// Copies at most n chars from t into s, pad with '\0'
-char *strncpy(char *s, const char *t, int n) {
-	char *ss = s;
-	while (n-- && (*s++ = *t++))
-		;
-	while (n-- > 0)		// Pad leftovers with '\0'
-		*s++ = '\0';
+// Copies at most n chars from s2 into s1, pad with '\0'.
+char *strncpy(char *restrict s1, const char *restrict s2, size_t n) {
+	char *ss = s1;
+
+	while (n-- && (*s1++ = *s2++))
+	/* Do Nothing */;
+
+	while (n-- > 0)		// Pad leftovers with '\0'.
+		*s1++ = '\0';
 	return ss;
 }

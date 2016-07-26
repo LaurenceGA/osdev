@@ -1,7 +1,7 @@
 #include "string.h"
 
 // concatenate t to the end of s; s must be big enough. Returns s
-char *strcat(char *s, const char *t) {
+char *strcat(char *restrict s, const char *restrict t) {
 	char *ss = s;	// So we can return our string
 	while (*s)	// Find the end of s
 		s++;
@@ -11,7 +11,7 @@ char *strcat(char *s, const char *t) {
 }
 
 // concatenate max n chars of t to the end of s; s must be big enough, Returns s
-char *strncat(char *s, const char *t, int n) {
+char *strncat(char *restrict s, const char *restrict t, size_t n) {
 	char *ss = s;	// So we can return our string
 	while (*s)	// Find the end of s
 		s++;

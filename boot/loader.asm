@@ -1,5 +1,5 @@
 global _loader		; Make the loader SubRoutine visible to the linker
-extern main		; We define the entry to the kernel in a c file
+extern kmain		; We define the entry to the kernel in a c file
 
 MODULEALIGN	equ 1<<0	; Align loaded modules to page boundaries
 MEMINFO		equ 1<<1	; We want GRUB to give us information regarding memory.
@@ -63,7 +63,7 @@ _loader:
 	mov cr3, ecx		; Load the Page Directory Base Register.
 
 	mov ecx, cr4
-	or ecx, 0x00000010	; Set the PSE bit in cr4 to enable 4MB pages
+	or ecx, 0x00000010	; Set the PSE bit in cr4 to enable 4MB pages.
 	mov cr4, ecx
 
 	mov ecx, cr0
@@ -94,7 +94,7 @@ STARTKERNEL:
 	add ebx, KVIRTUALBASE		; Map the multiboot info to the correct address.
 	push ebx
 
-	call main
+	call kmain
 	hlt
 
 section .bss
