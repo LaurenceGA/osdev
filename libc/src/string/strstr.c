@@ -1,5 +1,4 @@
 #include "string.h"
-#include "stddef.h"
 
 char *strstr(const char *s1, const char *s2) {
 	size_t len_s1, len_s2;

@@ -6,7 +6,7 @@ char *strcat(char *restrict s, const char *restrict t) {
 	while (*s)	// Find the end of s
 		s++;
 	while ((*s++ = *t++))
-		;
+	/* Do nothing */;
 	return ss;
 }
 

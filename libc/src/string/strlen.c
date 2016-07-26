@@ -9,7 +9,7 @@ size_t strlen(const char *s) {
 	const char *ss;
 
 	for (ss = s; *ss; ss++)
-	/* Do Nothing */;
+	/* Do nothing */;
 
 	return ss - s;
 }

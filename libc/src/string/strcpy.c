@@ -5,7 +5,7 @@ char *strcpy(char *restrict s1, const char *restrict s2) {
 	char *ss = s1;
 
 	while ((*s1++ = *s2++))
-	/* Do Nothing */;
+	/* Do nothing */;
 
 	return ss;
 }
@@ -15,7 +15,7 @@ char *strncpy(char *restrict s1, const char *restrict s2, size_t n) {
 	char *ss = s1;
 
 	while (n-- && (*s1++ = *s2++))
-	/* Do Nothing */;
+	/* Do nothing */;
 
 	while (n-- > 0)		// Pad leftovers with '\0'.
 		*s1++ = '\0';

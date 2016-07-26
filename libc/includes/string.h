@@ -1,7 +1,7 @@
 #ifndef _STRING_H
 #define _STRING_H
 
-#include <stddef.h>
+#include "stddef.h"
 
 int memcmp(const void *aptr, const void *bptr, size_t n);
 
@@ -10,7 +10,7 @@ void *memmove(void *s1, const void *s2, size_t n);
 void *memset(void *s, int c, size_t n);
 void *memchr(const void*, int, size_t n);
 
-void reverse(char *s);
+char *reverse(char *s);
 
 size_t strlen(const char *s);
 

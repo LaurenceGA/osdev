@@ -1,8 +1,12 @@
 #include "stdlib.h"
 #include "string.h"
 
-
-// Convert a value into its string representation.
+/*
+ * Convert the value into it's corresponding string representation, respecting
+ * the base that is passed.
+ *
+ * Returns the string representation if successful, otherwise a string of length 0.
+ */
 char *itoa(int value, char *buff, int base) {
 	if (base < 2 || base > 36) {
 		*buff = '\0';
@@ -26,6 +30,7 @@ char *itoa(int value, char *buff, int base) {
 		unsigned int unsigned_equiv = (unsigned int) value;
 		unsigned int utmp;
 
+		// The do loop is needed in case the value is 0.
 		do {
 			utmp = unsigned_equiv;
 			unsigned_equiv /= base;
@@ -35,7 +40,5 @@ char *itoa(int value, char *buff, int base) {
 
 	*ctmp = '\0';
 
-	reverse(buff);
-
-	return buff;
+	return reverse(buff);
 }
