@@ -34,9 +34,12 @@ static void registerKey(enum KEY_CODE keyCode, unsigned short scanCode,
 }
 
 // Returns true if finished scan code aquisition
-static bool readScanCode(void) {
-	*SCBufferHead++ = inb(KBD_DATA_PORT);
-	return !(inb(KBD_CMD_PORT) & 1);
+static bool readScanCode() {
+	unsigned char codeByte = inb(KBD_DATA_PORT);
+	*SCBufferHead++ = codeByte;
+	if (codeByte != 0xe0)	// More to come?
+		return true;
+	return false;
 }
 
 static char getASCII(enum KEY_CODE code) {
@@ -59,6 +62,70 @@ static char getASCII(enum KEY_CODE code) {
 	return ch;
 }
 
+void printKeyEvent(unsigned int keyPacket) {
+	unsigned char ASCII = (unsigned char) ((keyPacket & 0xff000000) >> 24);
+	// printf("%0#10x : %0#4x\n", keyPacket, ASCII);
+	if (keyPacket & 1)
+		printf("Release ");
+	else
+		printf("Pressed ");
+	printf("Key %#x ", (keyPacket & 0x00ff0000) >> 16);
+	printf("ASCII: ");
+	if (ASCII)
+		printf("'%c'", ASCII);
+	else
+		printf("None.");
+	if (keyPacket & 2) printf(" shft");
+	if (keyPacket & 4) printf(" ctrl");
+	if (keyPacket & 8) printf(" caps");
+	if (keyPacket & 16) printf(" repeat");
+	printf("\n");
+}
+
+unsigned int createKeyEvent(unsigned short scanCode) {
+	/*
+	Key event packet
+	32 bits
+	bit	| description
+	----------------------
+	31-23	| ASCII
+	22-14	| Key code
+	4	| 1 = Repeat
+	3	| Caps lock on
+	2	| 1 = ctrl down
+	1	| 1 = shift down
+	0	| 0 = press, 1 = release
+	*/
+	unsigned int keyEvent = 0;
+	enum KEY_CODE keycode;
+	if (scanCode & 0x80) {
+		// Set key event flag for released
+		keyEvent |= 0x1;
+		// Remove break bit flag
+		keycode = scanToKeycode[scanCode & 0xff7f];
+		// Set keycode bits 22-14
+		keyEvent |= keycode << 16;
+		keys[keycode].isPressed = false;
+		if (keycode == KEY_CAPS) {
+			capsLock = !capsLock;
+		}
+	} else {
+		keycode = scanToKeycode[scanCode];
+		keyEvent |= keycode << 16;
+		keyEvent |= (keys[keycode].isPressed ? 1 : 0) << 4;
+		keys[keycode].isPressed = true;
+	}
+	if (keycode == 0) {
+		printf("%#x\n", scanCode);
+	}
+	keyEvent |= getASCII(keycode) << 24;
+	keyEvent |= (capsLock ? 1 : 0) << 3;
+	keyEvent |= (keys[KEY_LCTRL].isPressed || keys[KEY_RCTRL].isPressed) << 2;
+	keyEvent |= (keys[KEY_LSHIFT].isPressed || keys[KEY_RSHIFT].isPressed) << 1;
+
+	return keyEvent;
+}
+
 void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 			struct stack_state stack) {
 	if (readScanCode()) {
@@ -69,8 +136,10 @@ void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 			code = (code << 8) + *bp;
 		}
 
-		enum KEY_CODE keycode;
-		if (code & 0x80) {
+		printKeyEvent(createKeyEvent(code));
+
+		// enum KEY_CODE keycode;
+		/*if (code & 0x80) {
 			// Remove break bit flag
 			keycode = scanToKeycode[code & 0xff7f];
 			keys[keycode].isPressed = false;
@@ -82,9 +151,9 @@ void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 			keys[keycode].isPressed = true;
 			char ASCII = getASCII(keycode);
 			if (ASCII) {
-				printf("%c", ASCII);
+				// prin/tf("%c", ASCII);
 			}
-		}
+		}*/
 
 		SCBufferHead = scanCodeBuffer; // Reset to start of buffer
 	}
@@ -94,6 +163,7 @@ void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 	(void) cpu;
 	(void) stack;
 }
+
 
 bool isDown(enum KEY_CODE code) {
 	return keys[code].isPressed;

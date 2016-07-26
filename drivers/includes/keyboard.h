@@ -26,6 +26,7 @@ enum KEY_CODE {
 
 void initKBD(void);
 bool isDown(enum KEY_CODE code);
+unsigned int createKeyEvent(unsigned short code);
 void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt, struct stack_state stack);
 
 #endif // KEYBOARD_H
