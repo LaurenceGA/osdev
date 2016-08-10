@@ -145,7 +145,7 @@ unsigned int createKeyEvent(unsigned short scanCode) {
 		keys[keycode].isPressed = true;
 	}
 	if (keycode == 0) {
-		printf("%#x\n", scanCode);
+		printf("0 keycode: %#x scancode\n", scanCode);
 	}
 	keyEvent |= getASCII(keycode) << 24;
 	keyEvent |= (capsLock ? 1 : 0) << 3;

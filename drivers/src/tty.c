@@ -119,6 +119,7 @@ void terminalPutC(char c) {
 				--cursorPos;
 			terminal_column = cursorPos % VGA_WIDTH;
 			terminal_row = cursorPos / VGA_WIDTH;
+                        terminal_buffer[cursorPos] = makeVGAEntry(' ', terminal_colour);
 			break;
 		}
 		default:

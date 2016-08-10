@@ -8,7 +8,8 @@
 // bits 7-5 (range 8) = row
 // bits 4-0 (range 32) = col
 enum KEY_CODE {
-/*R0*/	KEY_ESC, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8,
+        // Start KEY_ESC at 1 so we can have 0 be 'no key'
+/*R0*/	KEY_ESC=0x1, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8,
 	KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_PRSCR, KEY_INS, KEY_DEL,
 /*R1*/	KEY_GRAVE=0x20, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8,
 	KEY_9, KEY_0, KEY_MINUS, KEY_EQU, KEY_BCKSPC,
