@@ -27,6 +27,33 @@ static enum KEY_CODE scanToKeycode[512];
 static unsigned char scanCodeBuffer[6];
 static unsigned char *SCBufferHead = (unsigned char*) &scanCodeBuffer;
 
+#define BUFFER_CAPACITY 32
+struct eventQueue {
+	unsigned int contents[BUFFER_CAPACITY];
+	int count;
+	unsigned int *front;
+} keyEventBuffer;
+
+void enqueue(struct eventQueue *queue, unsigned int data) {
+	int backIndex = ((queue->front - queue->contents) + queue->count++) % BUFFER_CAPACITY;
+	queue->contents[backIndex] = data;
+}
+
+unsigned int dequeue(struct eventQueue *queue) {
+	if (queue->count == 0)
+		return 0;
+	queue->count--;
+	int currentIndex = ((queue->front - queue->contents)) % BUFFER_CAPACITY;
+	int newFrontIndex = (currentIndex + 1) % BUFFER_CAPACITY;
+	// printf("\n%d\n", newFrontIndex);
+	queue->front = &queue->contents[newFrontIndex];
+	return queue->contents[currentIndex];
+}
+
+bool isEmpty(struct eventQueue *queue) {
+	return queue->count == 0;
+}
+
 static void registerKey(enum KEY_CODE keyCode, unsigned short scanCode,
 			char ASCII, char altASCII) {
 	scanToKeycode[scanCode] = keyCode;
@@ -128,6 +155,19 @@ unsigned int createKeyEvent(unsigned short scanCode) {
 	return keyEvent;
 }
 
+char getchar() {
+	unsigned int event = 0;
+	while (true) {
+		if ((event = dequeue(&keyEventBuffer)) == 0) {
+			continue;
+		}
+		unsigned char ASCII = (unsigned char) ((event & 0xff000000) >> 24);
+		if (event && (event & 1) == 0) {
+			return ASCII;
+		}
+	}
+}
+
 void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 			struct stack_state stack) {
 	if (readScanCode()) {
@@ -138,7 +178,9 @@ void KBDinterrupt(struct cpu_state cpu, unsigned int interrupt,
 			code = (code << 8) + *bp;
 		}
 
-		printKeyEvent(createKeyEvent(code));
+		// printKeyEvent(createKeyEvent(code));
+		enqueue(&keyEventBuffer, createKeyEvent(code));
+		// printKeyEvent(dequeue(&keyEventBuffer));
 
 		// enum KEY_CODE keycode;
 		/*if (code & 0x80) {
@@ -173,6 +215,10 @@ bool isDown(enum KEY_CODE code) {
 
 void initKBD() {
 	registerInterruptHandler(KBD_INT_IDX, KBDinterrupt);
+
+	// key even buffer initialisation
+	keyEventBuffer.count = 0;
+	keyEventBuffer.front = keyEventBuffer.contents;
 
 	// R0
 	registerKey(KEY_ESC, 0x1, 0, 0);

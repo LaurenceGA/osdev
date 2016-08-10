@@ -21,7 +21,9 @@ int main() {
 	initKBD();
 	initIDT();	// Load IDT
 
-	printf("And we've reached the end.\n");
+	while(true) {
+		printf("%c", getchar());
+	}
 
 	return 0;
 }
